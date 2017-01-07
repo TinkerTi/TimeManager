@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">TimeManager</string>
+    <string name="bottom_text_view_activity">活动</string>
+    <string name="bottom_text_view_month_detail">记录</string>
+    <string name="bottom_text_view_me">我</string>
+
+    <string name="bottom_text_create_group">创建群组</string>
+    <string name="bottom_text_create_activity">创建活动</string>
+
+    <string name="create_group_hint">请输入活动群组名</string>
+    <string name="create_activity_hint">请输入活动名</string>
+
+    <string name="create_ok_button">确定</string>
+    <string name="create_cancel_button">取消</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/item_iv_activity_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <!--有可能会有很长的名字会挤占后边控件的空间-->
+    <TextView
+        android:id="@+id/item_tv_activity_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <!--活动时间显示-->
+    <LinearLayout
+        android:id="@+id/item_ll_activity_time_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/item_tv_activity_time_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/item_iv_activity_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/record_pause"/>
+        <ImageView
+            android:id="@+id/item_iv_activity_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/record_stop"/>
+    </LinearLayout>
+</LinearLayout>
