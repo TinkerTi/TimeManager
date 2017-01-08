@@ -11,7 +11,8 @@ import java.util.UUID;
 
 import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.model.ActivityInfo;
-import tinker.cn.timemanager.utils.ActivityInfoManager;
+import tinker.cn.timemanager.model.RecordInfo;
+import tinker.cn.timemanager.utils.DaoManager;
 import tinker.cn.timemanager.utils.BaseConstant;
 
 
@@ -35,16 +36,16 @@ public class CreateActivityDialogFragment extends BaseDialogFragment {
                         ActivityInfo info=new ActivityInfo();
                         info.setId(UUID.randomUUID().toString());
                         info.setFragmentTag(fragmentTag);
-                        info.setType(BaseConstant.CREATE_TYPE_ACTIVITY);
-                        //todo:设置是否为从群组内部创建还是单独创建
+                        info.setType(BaseConstant.TYPE_ACTIVITY);
                         if(mActivityInfo==null){
                             info.setParentGroupId(BaseConstant.Parent_GROUP_ID);
                         }else {
                             info.setParentGroupId(mActivityInfo.getId());
                         }
                         info.setName(editText.getText().toString().trim());
-
-                        ActivityInfoManager.getInstance().addActivity(info);
+                        info.setCreateTime(System.currentTimeMillis());
+                        info.setRecordInfo(new RecordInfo());
+                        DaoManager.getInstance().addActivity(info);
                         if (mListener != null) {
                             mListener.onDialogPositiveClick(CreateActivityDialogFragment.this, info);
                         }

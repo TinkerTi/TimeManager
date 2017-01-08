@@ -23,6 +23,10 @@ public class ActivityInfo implements Parcelable{
     private int type;   //是活动还是群组，
     private String parentGroupId;//所属群组，如果是单个活动或者群组，则为空""，否则为所属群组id
 
+
+
+    private long createTime;
+
     public ActivityInfo(){}
 
     protected ActivityInfo(Parcel in) {
@@ -32,6 +36,7 @@ public class ActivityInfo implements Parcelable{
         id = in.readString();
         type = in.readInt();
         parentGroupId = in.readString();
+        createTime=in.readLong();
     }
 
     @Override
@@ -42,6 +47,7 @@ public class ActivityInfo implements Parcelable{
         dest.writeString(id);
         dest.writeInt(type);
         dest.writeString(parentGroupId);
+        dest.writeLong(createTime);
     }
 
     @Override
@@ -108,6 +114,14 @@ public class ActivityInfo implements Parcelable{
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
     }
 
 }

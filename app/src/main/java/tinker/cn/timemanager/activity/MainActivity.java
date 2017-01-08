@@ -62,7 +62,7 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
             activityInfo=new ArrayList<>();
         }
         if(info!=null){
-            if(info.getParentGroupId().equals("")&&info.getType().equals("activity")){
+            if(info.getParentGroupId().equals("")&&info.getType()==BaseConstant.TYPE_ACTIVITY){
                 activityInfo.add(0,info);
             }else {
                 activityInfo.add(info);
