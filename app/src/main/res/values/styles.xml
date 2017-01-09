@@ -58,6 +58,7 @@
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:clickable">true</item>
     </style>
 
     <style name="item_activity_record_stop_icon">
@@ -66,6 +67,7 @@
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_marginTop">5dp</item>
         <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:clickable">true</item>
     </style>
 
 

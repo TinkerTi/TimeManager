@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff">
-    <ListView
+    <tinker.cn.timemanager.widget.ActivityListView
         android:id="@+id/fr_lv_activity_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:addStatesFromChildren="true"/>
     <ImageView
         android:id="@+id/fr_iv_add_activity"
         android:layout_width="50dp"

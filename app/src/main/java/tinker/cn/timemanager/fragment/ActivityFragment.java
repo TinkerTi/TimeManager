@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
 import tinker.cn.timemanager.utils.BaseConstant;
 import tinker.cn.timemanager.utils.DaoManager;
+import tinker.cn.timemanager.widget.ActivityListView;
 
 /**
  * Created by tiankui on 1/2/17.
@@ -33,7 +33,7 @@ import tinker.cn.timemanager.utils.DaoManager;
 public class ActivityFragment extends Fragment {
 
     //TODO: 在退出mainActivity或者activityFragment的时候，如果是在计时的话需要在后台仍然进行着；
-    private ListView mListView;
+    private ActivityListView mListView;
     private List<ActivityInfo> mActivityList;
     private ActivityListViewAdapter mActivityListViewAdapter;
     private static Handler mHandler;
@@ -73,7 +73,7 @@ public class ActivityFragment extends Fragment {
                 }
             }
         } else {
-            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{mActivityInfo.getId()}, BaseConstant.ORDER_BY_CREATE_TIME,BaseConstant.Activities.COLUMN_ID);
+            Cursor cursor = DaoManager.getInstance().getActivityInfo(new String[]{mActivityInfo.getId()});
             mActivityList = DaoManager.getInstance().parseCursor(cursor);
         }
 
@@ -86,7 +86,7 @@ public class ActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fr_activity_list, container, false);
 
         ImageView imageView = (ImageView) view.findViewById(R.id.fr_iv_add_activity);
-        mListView = (ListView) view.findViewById(R.id.fr_lv_activity_list);
+        mListView = (ActivityListView) view.findViewById(R.id.fr_lv_activity_list);
         mActivityListViewAdapter = new ActivityListViewAdapter();
         mListView.setAdapter(mActivityListViewAdapter);
 
@@ -131,19 +131,27 @@ public class ActivityFragment extends Fragment {
                         timeDisplayLinearLayout.setVisibility(View.VISIBLE);
                         timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
 
-                        if (recordInfo.getRecordState() == BaseConstant.READY_STATE || recordInfo.getRecordState() == BaseConstant.STOP_STATE) {
+                        if (recordInfo.getRecordState() == BaseConstant.READY_STATE) {
                             mHandler.postDelayed(runnable, 1000);
                             //点击记录活动开始的时间
-                            String[] conditionArgs;
-                            if (recordInfo.getBeginTime() == 0) {
-                                conditionArgs = new String[]{String.valueOf(0)};
-                                recordInfo.setBeginTime(System.currentTimeMillis());
-                            } else {
-                                conditionArgs = new String[]{String.valueOf(recordInfo.getBeginTime())};
-                            }
-                            DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, conditionArgs);
+                            String[] conditionArgs=new String[]{info.getId()};
+                            recordInfo.setBeginTime(System.currentTimeMillis());
+//                            if (recordInfo.getBeginTime() == 0) {
+//                                recordInfo.setBeginTime(System.currentTimeMillis());
+//                                conditionArgs = new String[]{info.getId(),String.valueOf(0)};
+//                            } else {
+//                                conditionArgs = new String[]{info.getId(),String.valueOf(recordInfo.getBeginTime())};
+//                            }
+                            DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.FIRST_UPDATE_RECORD_TIME_WHERE_CONDITION, conditionArgs);
                         }
 
+                        if(recordInfo.getRecordState()==BaseConstant.STOP_STATE){
+                            mHandler.postDelayed(runnable, 1000);
+
+                            info.setCreateTime(System.currentTimeMillis());
+                            recordInfo.setBeginTime(System.currentTimeMillis());
+                            DaoManager.getInstance().addActivity(info);
+                        }
                         startImageView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -274,7 +282,6 @@ public class ActivityFragment extends Fragment {
             final ImageView startImageView = (ImageView) view.findViewById(R.id.item_iv_activity_start);
             ImageView stopImageView = (ImageView) view.findViewById(R.id.item_iv_activity_stop);
             activityNameTextView.setText(info.getName());
-            //TODO:这个地方是有问题的，什么情况下该显示时间记录的情况，是由条件限制的；第一次创建群组或者活动的时候，recordInfo是空的；
             //TODO:所以不会显示，其他时候暂时还没有考虑；
             if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
                 activityIconImageView.setImageResource(R.mipmap.activity_icon);

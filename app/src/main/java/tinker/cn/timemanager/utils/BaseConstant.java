@@ -63,6 +63,7 @@ public final class BaseConstant {
 
 
 
+    public static final String FIRST_UPDATE_RECORD_TIME_WHERE_CONDITION= Activities.COLUMN_ID+" = ?";
 
     //根据活动开始的时间来更新活动记录的数据，而不是根据活动的id，因为同一个活动可以有很多条记录，这样的话就会把所有的记录都更改了；
     public static final String UPDATE_RECORD_TIME_WHERE_CONDITION= Activities.COLUMN_BEGIN_TIME+" = ?";

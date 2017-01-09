@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,11 +19,12 @@ import tinker.cn.timemanager.fragment.HistoryRecordsFragment;
 import tinker.cn.timemanager.fragment.MeFragment;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.utils.BaseConstant;
+import tinker.cn.timemanager.widget.FragmentViewPager;
 
 
 public class MainActivity extends FragmentActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener {
 
-    private ViewPager mViewPager;
+    private FragmentViewPager mViewPager;
     private Map<String, List<ActivityInfo>> mActivityInfoMap;
 
 
@@ -52,7 +52,7 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
     }
 
     private void initView() {
-        mViewPager = (ViewPager) findViewById(R.id.ac_vp_view_pager);
+        mViewPager = (FragmentViewPager) findViewById(R.id.ac_vp_view_pager);
     }
 
     @Override
