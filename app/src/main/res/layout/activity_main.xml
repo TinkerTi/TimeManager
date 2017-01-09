@@ -4,22 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+    <!--顶部布局-->
     <include layout="@layout/layout_main_top" />
-    <!--TODO：标题栏的布局-->
+
     <FrameLayout
         android:id="@+id/ac_fl_view_pager_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+
         <android.support.v4.view.ViewPager
             android:id="@+id/ac_vp_view_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
     </FrameLayout>
 
-
-    <!--TODO：底部切换布局-->
+    <!--底部布局-->
     <include layout="@layout/layout_main_bottom" />
 </LinearLayout>

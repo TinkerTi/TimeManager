@@ -25,7 +25,7 @@ import tinker.cn.timemanager.utils.BaseConstant;
 public class MainActivity extends FragmentActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener {
 
     private ViewPager mViewPager;
-    private Map<String,List<ActivityInfo>> mActivityInfoMap;
+    private Map<String, List<ActivityInfo>> mActivityInfoMap;
 
 
     @Override
@@ -39,9 +39,9 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
 
     private void initData() {
         List<Fragment> fragmentList = new ArrayList<>();
-        mActivityInfoMap=new HashMap<>();
-        ActivityFragment fragment=new ActivityFragment();
-        Bundle bundle=new Bundle();
+        mActivityInfoMap = new HashMap<>();
+        ActivityFragment fragment = new ActivityFragment();
+        Bundle bundle = new Bundle();
         bundle.putInt("createTag", BaseConstant.CREATE_ACTIVITY_OR_GROUP);
         fragment.setArguments(bundle);
         fragmentList.add(fragment);
@@ -57,20 +57,22 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialogFragment, ActivityInfo info) {
-        List<ActivityInfo> activityInfo=mActivityInfoMap.get(info.getFragmentTag());
-        if(activityInfo==null){
-            activityInfo=new ArrayList<>();
+        if (info == null) {
+            return;
         }
-        if(info!=null){
-            if(info.getParentGroupId().equals("")&&info.getType()==BaseConstant.TYPE_ACTIVITY){
-                activityInfo.add(0,info);
-            }else {
-                activityInfo.add(info);
-            }
-            mActivityInfoMap.put(info.getFragmentTag(),activityInfo);
+        List<ActivityInfo> activityInfo = mActivityInfoMap.get(info.getFragmentTag());
+        if (activityInfo == null) {
+            activityInfo = new ArrayList<>();
         }
-        ActivityFragment activityFragment=(ActivityFragment) getSupportFragmentManager().findFragmentByTag(info.getFragmentTag());
-        if(activityFragment!=null){
+
+        if (info.getParentGroupId().equals("") && info.getType() == BaseConstant.TYPE_ACTIVITY) {
+            activityInfo.add(0, info);
+        } else {
+            activityInfo.add(info);
+        }
+        mActivityInfoMap.put(info.getFragmentTag(), activityInfo);
+        ActivityFragment activityFragment = (ActivityFragment) getSupportFragmentManager().findFragmentByTag(info.getFragmentTag());
+        if (activityFragment != null) {
             activityFragment.updateList(activityInfo);
         }
     }
@@ -80,9 +82,10 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
 
     }
 
-    public List<ActivityInfo> getActivityInfo(String tag){
+    public List<ActivityInfo> getActivityInfo(String tag) {
         return mActivityInfoMap.get(tag);
     }
+
     private class MainFragmentPagerAdapter extends FragmentPagerAdapter {
 
         private List<Fragment> fragmentList;
@@ -107,6 +110,10 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
             }
             return 0;
         }
+    }
+
+    public Map<String, List<ActivityInfo>> getActivityInfoMap() {
+        return mActivityInfoMap;
     }
 
 }

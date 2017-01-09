@@ -54,11 +54,14 @@ public class ActivityInfoDao {
     }
 
 
-    public Cursor getActivityInfo(String[] columns,String selection,String[] selectionArgs,String orderBy){
+    public Cursor getActivityInfo(String[] columns,String selection,String[] selectionArgs,String orderBy,String groupBy){
 
-        return database.query(BaseConstant.Activities.TABLE_NAME,columns,selection,selectionArgs,null,null,orderBy);
+        return database.query(BaseConstant.Activities.TABLE_NAME,columns,selection,selectionArgs,groupBy,null,orderBy);
     }
 
+    public Cursor getActivityInfo(String[] args){
+        return database.rawQuery(BaseConstant.RAW_QUERY_SELECT_MAX_TOTAL_TIME,args);
+    }
     public int updateRecordInfo(RecordInfo info, String condition, String[] args){
         int count=-2;
         if(info!=null){
@@ -67,6 +70,7 @@ public class ActivityInfoDao {
             values.put(BaseConstant.Activities.COLUMN_END_TIME,info.getEndTime());
             values.put(BaseConstant.Activities.COLUMN_DURATION,info.getDuration());
             values.put(BaseConstant.Activities.COLUMN_RECORD_STATE,info.getRecordState());
+            values.put(BaseConstant.Activities.COLUMN_TOTAL_TIME,info.getTotalTime());
 
             count =database.update(BaseConstant.Activities.TABLE_NAME,values,condition,args);
         }

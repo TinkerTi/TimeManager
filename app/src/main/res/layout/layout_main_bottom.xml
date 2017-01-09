@@ -2,45 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="60dp"
     android:background="#aa00aa">
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/bottom_layout_linear_layout_style">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            style="@style/bottom_layout_image_view_style"
+            android:src="@mipmap/group_icon"/>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/bottom_layout_text_view_style"
             android:text="@string/bottom_text_view_activity"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/bottom_layout_linear_layout_style">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            style="@style/bottom_layout_image_view_style"
+            android:src="@mipmap/history_record_bottom_icon"/>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/bottom_layout_text_view_style"
             android:text="@string/bottom_text_view_month_detail"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/bottom_layout_linear_layout_style">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            style="@style/bottom_layout_image_view_style"
+            android:src="@mipmap/activity_icon"/>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/bottom_layout_text_view_style"
             android:text="@string/bottom_text_view_me"/>
     </LinearLayout>
 </LinearLayout>

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,15 +23,16 @@ import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
-import tinker.cn.timemanager.utils.DaoManager;
 import tinker.cn.timemanager.utils.BaseConstant;
+import tinker.cn.timemanager.utils.DaoManager;
 
 /**
  * Created by tiankui on 1/2/17.
  */
 
-public class ActivityFragment extends Fragment implements CreateActivityGroupDialogFragment.NoticeDialogListener {
+public class ActivityFragment extends Fragment {
 
+    //TODO: 在退出mainActivity或者activityFragment的时候，如果是在计时的话需要在后台仍然进行着；
     private ListView mListView;
     private List<ActivityInfo> mActivityList;
     private ActivityListViewAdapter mActivityListViewAdapter;
@@ -60,7 +60,8 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
 
         //TODO:读取数据库里边的数据，思路是应该判断下mActivityInfo 是否为空，如果是的，应该是最开始的Fragment，否则的话应该是点击群组之后的进入的；
         if (mActivityInfo == null) {
-            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{""}, BaseConstant.ORDER_BY_CREATE_TIME);
+//            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{""}, BaseConstant.ORDER_BY_CREATE_TIME,BaseConstant.Activities.COLUMN_ID);
+            Cursor cursor=DaoManager.getInstance().getActivityInfo(new String[]{""});
             List<ActivityInfo> activityInfoList = DaoManager.getInstance().parseCursor(cursor);
             if (activityInfoList.size() > 0) {
                 for (ActivityInfo info : activityInfoList) {
@@ -72,9 +73,11 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                 }
             }
         } else {
-            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{mActivityInfo.getId()}, BaseConstant.ORDER_BY_CREATE_TIME);
+            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{mActivityInfo.getId()}, BaseConstant.ORDER_BY_CREATE_TIME,BaseConstant.Activities.COLUMN_ID);
             mActivityList = DaoManager.getInstance().parseCursor(cursor);
         }
+
+        ((MainActivity)getActivity()).getActivityInfoMap().put(getTag(),mActivityList);
     }
 
     @Nullable
@@ -103,7 +106,7 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                         final RecordInfo recordInfo;
                         final Runnable runnable;
                         if (view.getTag() == null) {
-                            recordInfo = new RecordInfo();
+                            recordInfo =info.getRecordInfo();
                             recordInfo.setView(view);
                             runnable = new Runnable() {
                                 @Override
@@ -111,8 +114,8 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                                     //TODO: 设置暂停的图片
                                     startImageView.setImageResource(R.mipmap.record_pause);
                                     recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
-//                                    recordInfo.setDuration(recordInfo.getDuration() + 1);
-                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+1);
+
+                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+1000);
                                     timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
                                     recordInfo.setRunnable(this);
                                     updateInfo(position, recordInfo);
@@ -126,7 +129,7 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                         }
 
                         timeDisplayLinearLayout.setVisibility(View.VISIBLE);
-                        timeDisplayTextView.setText(calculateTimeString(recordInfo.getDuration()));
+                        timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
 
                         if (recordInfo.getRecordState() == BaseConstant.READY_STATE || recordInfo.getRecordState() == BaseConstant.STOP_STATE) {
                             mHandler.postDelayed(runnable, 1000);
@@ -153,6 +156,8 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
 
                                     recordInfo.setEndTime(System.currentTimeMillis());
                                     recordInfo.setDuration(recordInfo.getEndTime()-recordInfo.getBeginTime());
+                                    //之前的totalTime加上这次的持续时间；
+//                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+recordInfo.getDuration());
                                     DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
 
                                 } else if (recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
@@ -180,6 +185,8 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                                 updateInfo(position, recordInfo);
                                 recordInfo.setEndTime(System.currentTimeMillis());
                                 recordInfo.setDuration(recordInfo.getEndTime()-recordInfo.getBeginTime());
+
+//                                recordInfo.setTotalTime(recordInfo.getTotalTime()+recordInfo.getDuration());
                                 DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
                             }
                         });
@@ -226,16 +233,6 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
         mActivityListViewAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialogFragment, ActivityInfo info) {
-        mActivityList.add(info);
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialogFragment) {
-
-    }
-
     private class ActivityListViewAdapter extends BaseAdapter {
 
         @Override
@@ -263,24 +260,24 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
         public View getView(int position, View convertView, ViewGroup parent) {
             ActivityInfo info = (ActivityInfo) getItem(position);
             RecordInfo recordInfo = info.getRecordInfo();
+            View view=null;
             if (recordInfo != null) {
-                convertView = recordInfo.getView();
+                view = recordInfo.getView();
             }
-            if (convertView == null) {
-                convertView = View.inflate(getActivity(), R.layout.item_activity_list_view, null);
+            if (view == null) {
+                view = View.inflate(getActivity(), R.layout.item_activity_list_view, null);
             }
-            ImageView activityIconImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_icon);
-            TextView activityNameTextView = (TextView) convertView.findViewById(R.id.item_tv_activity_name);
-            final LinearLayout timeDisplayLinearLayout = (LinearLayout) convertView.findViewById(R.id.item_ll_activity_time_display);
-            final TextView timeDisplayTextView = (TextView) convertView.findViewById(R.id.item_tv_activity_time_display);
-            final ImageView startImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_start);
-            ImageView stopImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_stop);
-            //TODO:根据是群组还是活动来决定使用对应的图标
-
+            ImageView activityIconImageView = (ImageView) view.findViewById(R.id.item_iv_activity_icon);
+            TextView activityNameTextView = (TextView) view.findViewById(R.id.item_tv_activity_name);
+            final LinearLayout timeDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.item_ll_activity_time_display);
+            final TextView timeDisplayTextView = (TextView) view.findViewById(R.id.item_tv_activity_time_display);
+            final ImageView startImageView = (ImageView) view.findViewById(R.id.item_iv_activity_start);
+            ImageView stopImageView = (ImageView) view.findViewById(R.id.item_iv_activity_stop);
             activityNameTextView.setText(info.getName());
             //TODO:这个地方是有问题的，什么情况下该显示时间记录的情况，是由条件限制的；第一次创建群组或者活动的时候，recordInfo是空的；
             //TODO:所以不会显示，其他时候暂时还没有考虑；
             if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
+                activityIconImageView.setImageResource(R.mipmap.activity_icon);
                 if (recordInfo != null) {
                     if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE ||
                             recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
@@ -288,33 +285,36 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                     }
                 }
                 if (recordInfo != null) {
-                    timeDisplayTextView.setText(calculateTimeString(recordInfo.getDuration()));
+                    timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
                     if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
                         mHandler.removeCallbacks(recordInfo.getRunnable());
                         mHandler.postDelayed(recordInfo.getRunnable(), 1000);
                     }
                 }
+            }else {
+                activityIconImageView.setImageResource(R.mipmap.group_icon);
             }
 
-            return convertView;
+            return view;
         }
     }
 
-    private String calculateTimeString(long time) {
+    private String calculateTimeString(long timeMillis) {
+        long timeSeconds=timeMillis/1000;
         StringBuilder builder = new StringBuilder();
-        if (time < 60) {
+        if (timeSeconds < 60) {
             builder.append("00:00:")
-                    .append(formatTime(time));
-        } else if (time < 60 * 60) {
-            long minutes = time / 60;
-            long seconds = time % 60;
+                    .append(formatTime(timeSeconds));
+        } else if (timeSeconds < 60 * 60) {
+            long minutes = timeSeconds / 60;
+            long seconds = timeSeconds % 60;
             builder.append("00:")
                     .append(formatTime(minutes))
                     .append(":")
                     .append(formatTime(seconds));
-        } else if (time < 99 * 3600) {
-            long hours = time / 3600;
-            long rest = time % 3600;
+        } else if (timeSeconds < 99 * 3600) {
+            long hours = timeSeconds / 3600;
+            long rest = timeSeconds % 3600;
             long minutes = rest / 60;
             long seconds = rest % 60;
             builder.append(formatTime(hours))
@@ -323,8 +323,8 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
                     .append(":")
                     .append(formatTime(seconds));
         } else {
-            long days = time / (24 * 3600);
-            long restTime = time % (24 * 3600);
+            long days = timeSeconds / (24 * 3600);
+            long restTime = timeSeconds % (24 * 3600);
             long hours = restTime / 3600;
             long rest = restTime % 3600;
             long minutes = rest / 60;
@@ -365,6 +365,7 @@ public class ActivityFragment extends Fragment implements CreateActivityGroupDia
         }
         return builder.toString();
     }
+
 
 
 }
