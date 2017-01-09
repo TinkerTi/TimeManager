@@ -1,38 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="65dp"
+    android:background="#ffffff"
     android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/fr_ll_create_group"
-        android:layout_width="40dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/fr_create_group_or_activity_select_image_ll_style">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            style="@style/fr_create_group_or_activity_select_image_view_style"
+            android:src="@mipmap/group_icon" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/fr_create_group_or_activity_select_text_view_style"
             android:text="@string/bottom_text_create_group" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/fr_ll_create_activity"
-        android:layout_width="40dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        style="@style/fr_create_group_or_activity_select_image_ll_style">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            style="@style/fr_create_group_or_activity_select_image_view_style"
+            android:src="@mipmap/activity_icon" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/fr_create_group_or_activity_select_text_view_style"
             android:text="@string/bottom_text_create_activity" />
     </LinearLayout>
 </LinearLayout>

@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import tinker.cn.timemanager.R;
 
@@ -56,7 +59,11 @@ public class BottomCreateDialogFragment extends DialogFragment {
             }
         });
         builder.setView(view);
-        return builder.create();
+        Dialog dialog=builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        WindowManager.LayoutParams windowManagerParams=dialog.getWindow().getAttributes();
+        windowManagerParams.gravity= Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
+        return dialog;
     }
 
 }
