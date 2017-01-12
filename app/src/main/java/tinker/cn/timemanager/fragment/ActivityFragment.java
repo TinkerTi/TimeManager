@@ -1,8 +1,13 @@
 package tinker.cn.timemanager.fragment;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,9 +27,13 @@ import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
+import tinker.cn.timemanager.service.RecordService;
 import tinker.cn.timemanager.utils.BaseConstant;
 import tinker.cn.timemanager.utils.DaoManager;
+import tinker.cn.timemanager.utils.FormatTime;
 import tinker.cn.timemanager.widget.ActivityListView;
+
+import static tinker.cn.timemanager.utils.FormatTime.calculateTimeString;
 
 /**
  * Created by tiankui on 1/2/17.
@@ -41,6 +50,8 @@ public class ActivityFragment extends Fragment {
 
     private int createTag;
     private ActivityInfo mActivityInfo;
+
+    private RecordService.RecordServiceBinder mServiceBinder;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,7 +72,7 @@ public class ActivityFragment extends Fragment {
         //TODO:读取数据库里边的数据，思路是应该判断下mActivityInfo 是否为空，如果是的，应该是最开始的Fragment，否则的话应该是点击群组之后的进入的；
         if (mActivityInfo == null) {
 //            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{""}, BaseConstant.ORDER_BY_CREATE_TIME,BaseConstant.Activities.COLUMN_ID);
-            Cursor cursor=DaoManager.getInstance().getActivityInfo(new String[]{""});
+            Cursor cursor = DaoManager.getInstance().getActivityInfo(new String[]{""});
             List<ActivityInfo> activityInfoList = DaoManager.getInstance().parseCursor(cursor);
             if (activityInfoList.size() > 0) {
                 for (ActivityInfo info : activityInfoList) {
@@ -77,7 +88,7 @@ public class ActivityFragment extends Fragment {
             mActivityList = DaoManager.getInstance().parseCursor(cursor);
         }
 
-        ((MainActivity)getActivity()).getActivityInfoMap().put(getTag(),mActivityList);
+        ((MainActivity) getActivity()).getActivityInfoMap().put(getTag(), mActivityList);
     }
 
     @Nullable
@@ -103,101 +114,7 @@ public class ActivityFragment extends Fragment {
                     ImageView stopImageView = (ImageView) view.findViewById(R.id.item_iv_activity_stop);
 
                     if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
-                        final RecordInfo recordInfo;
-                        final Runnable runnable;
-                        if (view.getTag() == null) {
-                            recordInfo =info.getRecordInfo();
-                            recordInfo.setView(view);
-                            runnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    //TODO: 设置暂停的图片
-                                    startImageView.setImageResource(R.mipmap.record_pause);
-                                    recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
-
-                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+1000);
-                                    timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
-                                    recordInfo.setRunnable(this);
-                                    updateInfo(position, recordInfo);
-                                    mHandler.postDelayed(this, 1000);
-                                }
-                            };
-                            view.setTag(recordInfo);
-                        } else {
-                            recordInfo = (RecordInfo) view.getTag();
-                            runnable = recordInfo.getRunnable();
-                        }
-
-                        timeDisplayLinearLayout.setVisibility(View.VISIBLE);
-                        timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
-
-                        if (recordInfo.getRecordState() == BaseConstant.READY_STATE) {
-                            mHandler.postDelayed(runnable, 1000);
-                            //点击记录活动开始的时间
-                            String[] conditionArgs=new String[]{info.getId()};
-                            recordInfo.setBeginTime(System.currentTimeMillis());
-//                            if (recordInfo.getBeginTime() == 0) {
-//                                recordInfo.setBeginTime(System.currentTimeMillis());
-//                                conditionArgs = new String[]{info.getId(),String.valueOf(0)};
-//                            } else {
-//                                conditionArgs = new String[]{info.getId(),String.valueOf(recordInfo.getBeginTime())};
-//                            }
-                            DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.FIRST_UPDATE_RECORD_TIME_WHERE_CONDITION, conditionArgs);
-                        }
-
-                        if(recordInfo.getRecordState()==BaseConstant.STOP_STATE){
-                            mHandler.postDelayed(runnable, 1000);
-
-                            info.setCreateTime(System.currentTimeMillis());
-                            recordInfo.setBeginTime(System.currentTimeMillis());
-                            DaoManager.getInstance().addActivity(info);
-                        }
-                        startImageView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
-                                    //TODO:设置开始的图片
-                                    startImageView.setImageResource(R.mipmap.record_start);
-                                    mHandler.removeCallbacks(runnable);
-                                    recordInfo.setRecordState(BaseConstant.PAUSE_STATE);
-                                    updateInfo(position, recordInfo);
-
-                                    recordInfo.setEndTime(System.currentTimeMillis());
-                                    recordInfo.setDuration(recordInfo.getEndTime()-recordInfo.getBeginTime());
-                                    //之前的totalTime加上这次的持续时间；
-//                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+recordInfo.getDuration());
-                                    DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
-
-                                } else if (recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
-                                    //TODO:这个地方的逻辑需要理清楚一下；
-                                    //TODO:如果是暂停了又开始，那么就需要重新计算持续时间（数据库里边的数据），但是显示的却是累积 的时间；
-                                    startImageView.setImageResource(R.mipmap.record_pause);
-                                    mHandler.postDelayed(runnable, 1000);
-                                    recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
-                                    updateInfo(position, recordInfo);
-
-                                    info.setCreateTime(System.currentTimeMillis());
-                                    recordInfo.setBeginTime(System.currentTimeMillis());
-                                    DaoManager.getInstance().addActivity(info);
-                                }
-                            }
-                        });
-
-                        stopImageView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mHandler.removeCallbacks(runnable);
-                                startImageView.setImageResource(R.mipmap.record_pause);
-                                timeDisplayLinearLayout.setVisibility(View.GONE);
-                                recordInfo.setRecordState(BaseConstant.STOP_STATE);
-                                updateInfo(position, recordInfo);
-                                recordInfo.setEndTime(System.currentTimeMillis());
-                                recordInfo.setDuration(recordInfo.getEndTime()-recordInfo.getBeginTime());
-
-//                                recordInfo.setTotalTime(recordInfo.getTotalTime()+recordInfo.getDuration());
-                                DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
-                            }
-                        });
+                        //TODO:点击进入对应activity的详情页面
                     } else {
                         ActivityFragment activityFragment = new ActivityFragment();
                         Bundle bundle = new Bundle();
@@ -265,87 +182,151 @@ public class ActivityFragment extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ActivityInfo info = (ActivityInfo) getItem(position);
-            RecordInfo recordInfo = info.getRecordInfo();
-            View view=null;
-            if (recordInfo != null) {
-                view = recordInfo.getView();
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            final ActivityInfo info = (ActivityInfo) getItem(position);
+            final RecordInfo recordInfo = info.getRecordInfo();
+            final Runnable runnable;
+            convertView = recordInfo.getView();
+            if (convertView == null) {
+                convertView = View.inflate(getActivity(), R.layout.item_activity_list_view, null);
+                recordInfo.setView(convertView);
             }
-            if (view == null) {
-                view = View.inflate(getActivity(), R.layout.item_activity_list_view, null);
-            }
-            ImageView activityIconImageView = (ImageView) view.findViewById(R.id.item_iv_activity_icon);
-            TextView activityNameTextView = (TextView) view.findViewById(R.id.item_tv_activity_name);
-            final LinearLayout timeDisplayLinearLayout = (LinearLayout) view.findViewById(R.id.item_ll_activity_time_display);
-            final TextView timeDisplayTextView = (TextView) view.findViewById(R.id.item_tv_activity_time_display);
-            final ImageView startImageView = (ImageView) view.findViewById(R.id.item_iv_activity_start);
-            ImageView stopImageView = (ImageView) view.findViewById(R.id.item_iv_activity_stop);
+            ImageView activityIconImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_icon);
+            TextView activityNameTextView = (TextView) convertView.findViewById(R.id.item_tv_activity_name);
+            final LinearLayout timeDisplayLinearLayout = (LinearLayout) convertView.findViewById(R.id.item_ll_activity_time_display);
+            final TextView timeDisplayTextView = (TextView) convertView.findViewById(R.id.item_tv_activity_time_display);
+            final ImageView startImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_start);
+            final ImageView stopImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_stop);
             activityNameTextView.setText(info.getName());
-            //TODO:所以不会显示，其他时候暂时还没有考虑；
+
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    //TODO: 设置暂停的图片
+                    startImageView.setImageResource(R.mipmap.record_pause);
+                    recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
+                    recordInfo.setTotalTime(recordInfo.getTotalTime() + 1000);
+                    timeDisplayTextView.setText(FormatTime.calculateTimeString(recordInfo.getTotalTime()));
+                    recordInfo.setRunnable(this);
+                    updateInfo(position, recordInfo);
+                    mHandler.postDelayed(this, 1000);
+                }
+            };
+            final Runnable lastRunnable = recordInfo.getRunnable();
+            recordInfo.setRunnable(runnable);
+            //ui显示问题
             if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
                 activityIconImageView.setImageResource(R.mipmap.activity_icon);
-                if (recordInfo != null) {
-                    if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE ||
-                            recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
-                        timeDisplayLinearLayout.setVisibility(View.VISIBLE);
-                    }
+                if (recordInfo.getRecordState() == BaseConstant.READY_STATE || recordInfo.getRecordState() == BaseConstant.STOP_STATE) {
+                    timeDisplayTextView.setVisibility(View.INVISIBLE);
+                    stopImageView.setVisibility(View.INVISIBLE);
                 }
-                if (recordInfo != null) {
+                if (recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
                     timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
-                    if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
-                        mHandler.removeCallbacks(recordInfo.getRunnable());
-                        mHandler.postDelayed(recordInfo.getRunnable(), 1000);
-                    }
+                    startImageView.setImageResource(R.mipmap.record_start);
                 }
-            }else {
+                if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
+                    timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
+                    mHandler.removeCallbacks(lastRunnable);
+                    mHandler.postDelayed(recordInfo.getRunnable(), 1000);
+                }
+            } else {
                 activityIconImageView.setImageResource(R.mipmap.group_icon);
+                timeDisplayLinearLayout.setVisibility(View.INVISIBLE);
             }
 
-            return view;
+
+            startImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (recordInfo.getRecordState() == BaseConstant.READY_STATE) {
+                        timeDisplayTextView.setVisibility(View.VISIBLE);
+                        stopImageView.setVisibility(View.VISIBLE);
+                        timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
+                        mHandler.postDelayed(recordInfo.getRunnable(), 1000);
+                        //点击记录活动开始的时间
+                        String[] conditionArgs = new String[]{info.getId()};
+                        recordInfo.setBeginTime(System.currentTimeMillis());
+                        DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.FIRST_UPDATE_RECORD_TIME_WHERE_CONDITION, conditionArgs);
+
+                        Intent intent = new Intent(getActivity(), RecordService.class);
+                        intent.putExtra("activityInfo", info);
+                        getActivity().startService(intent);
+                        getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
+                    }
+                    if (recordInfo.getRecordState() == BaseConstant.STOP_STATE) {
+                        //开始记录活动时间，并且是一条新的记录
+                        timeDisplayTextView.setVisibility(View.VISIBLE);
+                        stopImageView.setVisibility(View.VISIBLE);
+                        recordInfo.setTotalTime(0);
+                        timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
+                        mHandler.postDelayed(runnable, 1000);
+                        info.setCreateTime(System.currentTimeMillis());
+                        recordInfo.setBeginTime(System.currentTimeMillis());
+                        DaoManager.getInstance().addActivity(info);
+                    }
+
+                    if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
+                        //TODO:设置开始的图片
+                        startImageView.setImageResource(R.mipmap.record_start);
+                        mHandler.removeCallbacks(recordInfo.getRunnable());
+                        //暂停的时候也需要暂停通知中的时间显示；
+                        mServiceBinder.pauseRecorder(info.getId());
+                        recordInfo.setRecordState(BaseConstant.PAUSE_STATE);
+                        updateInfo(position, recordInfo);
+
+                        recordInfo.setEndTime(System.currentTimeMillis());
+                        recordInfo.setDuration(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                        //之前的totalTime加上这次的持续时间；
+//                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+recordInfo.getDuration());
+                        DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
+
+                    } else if (recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
+                        //TODO:这个地方的逻辑需要理清楚一下；
+                        //TODO:如果是暂停了又开始，那么就需要重新计算持续时间（数据库里边的数据），但是显示的却是累积 的时间；
+
+                        //这段代码的目的是第一次进入app的时候需要bind service
+                        Intent intent = new Intent(getActivity(), RecordService.class);
+                        intent.putExtra("activityInfo", info);
+                        getActivity().startService(intent);
+                        getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
+
+                        startImageView.setImageResource(R.mipmap.record_pause);
+                        mHandler.postDelayed(runnable, 1000);
+                        //再次开始计时
+                        mServiceBinder.resumeRecorder(info.getId());
+                        recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
+                        updateInfo(position, recordInfo);
+
+                        info.setCreateTime(System.currentTimeMillis());
+                        recordInfo.setBeginTime(System.currentTimeMillis());
+                        DaoManager.getInstance().addActivity(info);
+                    }
+                }
+            });
+
+            stopImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    stopImageView.setVisibility(View.INVISIBLE);
+                    timeDisplayTextView.setVisibility(View.INVISIBLE);
+                    startImageView.setImageResource(R.mipmap.record_start);
+                    mHandler.removeCallbacks(runnable);
+                    mServiceBinder.stopRecorder(info.getId());
+
+                    updateInfo(position, recordInfo);
+                    if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
+                        recordInfo.setEndTime(System.currentTimeMillis());
+                        recordInfo.setDuration(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                        DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
+                    }
+                    recordInfo.setRecordState(BaseConstant.STOP_STATE);
+                }
+            });
+            return convertView;
         }
     }
 
-    private String calculateTimeString(long timeMillis) {
-        long timeSeconds=timeMillis/1000;
-        StringBuilder builder = new StringBuilder();
-        if (timeSeconds < 60) {
-            builder.append("00:00:")
-                    .append(formatTime(timeSeconds));
-        } else if (timeSeconds < 60 * 60) {
-            long minutes = timeSeconds / 60;
-            long seconds = timeSeconds % 60;
-            builder.append("00:")
-                    .append(formatTime(minutes))
-                    .append(":")
-                    .append(formatTime(seconds));
-        } else if (timeSeconds < 99 * 3600) {
-            long hours = timeSeconds / 3600;
-            long rest = timeSeconds % 3600;
-            long minutes = rest / 60;
-            long seconds = rest % 60;
-            builder.append(formatTime(hours))
-                    .append(":")
-                    .append(formatTime(minutes))
-                    .append(":")
-                    .append(formatTime(seconds));
-        } else {
-            long days = timeSeconds / (24 * 3600);
-            long restTime = timeSeconds % (24 * 3600);
-            long hours = restTime / 3600;
-            long rest = restTime % 3600;
-            long minutes = rest / 60;
-            long seconds = rest % 60;
-            builder.append(formatTime(days))
-                    .append("天")
-                    .append(formatTime(hours))
-                    .append(":")
-                    .append(formatTime(minutes))
-                    .append(":")
-                    .append(formatTime(seconds));
-        }
-        return builder.toString();
-    }
 
     /**
      * 用于ui上的刷新
@@ -362,17 +343,32 @@ public class ActivityFragment extends Fragment {
         }
     }
 
-    private String formatTime(long time) {
-        StringBuilder builder = new StringBuilder();
-        if (time < 10) {
-            builder.append("0")
-                    .append(String.valueOf(time));
-        } else {
-            builder.append(String.valueOf(time));
-        }
-        return builder.toString();
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        //TODO:这个需要改善下，把这个放在第一次点击某一个活动的时候；
+//        Cursor cursor=DaoManager.getInstance().getActivityInfo(BaseConstant.GET_RECORDING_STATE_ACTIVITY,new String[]{String.valueOf(BaseConstant.RECORDING_STATE)});
+//        mActivityList=DaoManager.getInstance().parseCursor(cursor);
+//        ArrayList<ActivityInfo> arrayList=new ArrayList<>();
+//        if(mActivityList!=null){
+//            for (ActivityInfo info:mActivityList){
+//                  arrayList.add(info);
+//            }
+//        }
+
     }
 
+    private class RecordServiceConnection implements ServiceConnection {
 
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mServiceBinder=(RecordService.RecordServiceBinder)service;
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    }
 }

@@ -27,21 +27,7 @@ public final class BaseConstant {
     public static final int PAUSE_STATE=2;
     public static final int STOP_STATE=3;
 
-    public static final String[] columns=new String[]{
-            Activities._ID,
-            Activities.COLUMN_ID,
-            Activities.COLUMN_NAME,
-            Activities.COLUMN_TYPE,
-            Activities.COLUMN_PARENT_GROUP_ID,
-            Activities.COLUMN_BEGIN_TIME,
-            Activities.COLUMN_END_TIME,
-            Activities.COLUMN_DURATION,
-            Activities.COLUMN_RECORD_STATE,
-            Activities.COLUMN_CREATE_TIME,
-            Activities.COLUMN_TOTAL_TIME,
-    };
-    public static final String PARENT_GROUP_SELECTION =Activities.COLUMN_PARENT_GROUP_ID+" = ?";
-    public static final String ORDER_BY_CREATE_TIME= Activities.COLUMN_CREATE_TIME+ " desc";
+    public static final int ONGOING_NOTIFICATION_ID=0;
 
     public static final String RAW_QUERY_SELECT_MAX_TOTAL_TIME="select "
             +Activities._ID+","
@@ -59,6 +45,7 @@ public final class BaseConstant {
             +" where "+Activities.COLUMN_PARENT_GROUP_ID
             +" = ?"
             +"group by "+Activities.COLUMN_ID
+            +" order by "+Activities.COLUMN_CREATE_TIME+" asc"
             +";";
 
 
@@ -67,7 +54,7 @@ public final class BaseConstant {
 
     //根据活动开始的时间来更新活动记录的数据，而不是根据活动的id，因为同一个活动可以有很多条记录，这样的话就会把所有的记录都更改了；
     public static final String UPDATE_RECORD_TIME_WHERE_CONDITION= Activities.COLUMN_BEGIN_TIME+" = ?";
-
+    public static final String GET_RECORDING_STATE_ACTIVITY=Activities.COLUMN_RECORD_STATE+" =?";
     private BaseConstant(){}
 
     public static class Activities implements BaseColumns{

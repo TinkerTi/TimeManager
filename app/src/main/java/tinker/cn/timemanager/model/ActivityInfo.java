@@ -7,16 +7,16 @@ import android.os.Parcelable;
  * Created by tiankui on 1/3/17.
  */
 
-public class ActivityInfo implements Parcelable{
+public class ActivityInfo implements Parcelable {
 
     /**
      * activity有两类，一类是独立的Activity，一类是存在于群组类的Activity，
      * 其实这两类也可以看做一类，即都是Activity，只是第一类Activity所属的群组为空
      * 第二类归属于某一个群组；
-     *
      */
     private String fragmentTag;
     private RecordInfo recordInfo;
+    private NotificationInfo notificationInfo;
 
     private String id;//每一个后动或者群组对应一个id；这个要个数据库中的每一排的唯一的id区分开
     private String name;    //活动或者群组名；
@@ -24,10 +24,10 @@ public class ActivityInfo implements Parcelable{
     private String parentGroupId;//所属群组，如果是单个活动或者群组，则为空""，否则为所属群组id
 
 
-
     private long createTime;
 
-    public ActivityInfo(){}
+    public ActivityInfo() {
+    }
 
     protected ActivityInfo(Parcel in) {
         name = in.readString();
@@ -36,7 +36,7 @@ public class ActivityInfo implements Parcelable{
         id = in.readString();
         type = in.readInt();
         parentGroupId = in.readString();
-        createTime=in.readLong();
+        createTime = in.readLong();
     }
 
     @Override
@@ -124,4 +124,12 @@ public class ActivityInfo implements Parcelable{
         this.createTime = createTime;
     }
 
+
+    public NotificationInfo getNotificationInfo() {
+        return notificationInfo;
+    }
+
+    public void setNotificationInfo(NotificationInfo notificationInfo) {
+        this.notificationInfo = notificationInfo;
+    }
 }

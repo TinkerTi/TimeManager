@@ -77,4 +77,8 @@ public class ActivityInfoDao {
         return count;
     }
 
+    public Cursor getActivityInfo(String selection,String[] args){
+       return database.query(BaseConstant.Activities.TABLE_NAME,null,selection,args,null,null,null);
+    }
+
 }

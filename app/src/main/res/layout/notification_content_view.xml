@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical">
+
+    <ImageView
+        style="@style/item_activity_or_group_icon"
+        android:src="@mipmap/ic_launcher"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/notification_tv_record_time"
+            style="@style/item_activity_record_time_text_view_style"
+            android:text="00:00:00"
+            android:gravity="center_horizontal"/>
+        <TextView
+            style="@style/item_activity_record_time_text_view_style"
+            android:text="活动"
+            android:gravity="center_horizontal"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/notification_iv_pause"
+         style="@style/item_activity_record_start_icon"
+        android:src="@mipmap/record_pause"/>
+    <ImageView
+        android:id="@+id/notification_iv_stop"
+        style="@style/item_activity_record_stop_icon"
+        android:src="@mipmap/record_stop"/>
+</LinearLayout>

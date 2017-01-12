@@ -3,6 +3,7 @@ package tinker.cn.timemanager.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
+import android.widget.RemoteViews;
 
 /**
  * Created by tiankui on 1/4/17.
@@ -12,6 +13,7 @@ public class RecordInfo implements Parcelable{
 
     private Runnable runnable;
     private View view;
+    private RemoteViews remoteViews;
 
     private long duration;
     private long beginTime;
@@ -109,6 +111,15 @@ public class RecordInfo implements Parcelable{
 
     public void setTotalTime(long totalTime) {
         this.totalTime = totalTime;
+    }
+
+
+    public RemoteViews getRemoteViews() {
+        return remoteViews;
+    }
+
+    public void setRemoteViews(RemoteViews remoteViews) {
+        this.remoteViews = remoteViews;
     }
 
 }
