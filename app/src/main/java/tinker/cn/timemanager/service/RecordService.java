@@ -21,6 +21,7 @@ import tinker.cn.timemanager.model.NotificationInfo;
 import tinker.cn.timemanager.model.RecordInfo;
 import tinker.cn.timemanager.utils.BaseConstant;
 import tinker.cn.timemanager.utils.FormatTime;
+import tinker.cn.timemanager.utils.GenerateNotificationID;
 
 /**
  * Created by tiankui on 1/10/17.
@@ -48,81 +49,121 @@ public class RecordService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        final ActivityInfo info = intent.getParcelableExtra("activityInfo");
-        if (info != null) {
-            mActivityInfoMap.put(info.getId(), info);
-            final RecordInfo recordInfo = info.getRecordInfo();
-            final Notification notification = new Notification(R.mipmap.ic_launcher, null, 0);
-            final RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
-            notification.contentView = notificationView;
-            Intent pauseIntent = new Intent();
-            PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, 0);
-            notificationView.setOnClickPendingIntent(R.id.notification_iv_pause, pendingPauseIntent);
-            notificationView.setOnClickPendingIntent(R.id.notification_iv_stop, pendingPauseIntent);
-            //TODO:set TextView text
-            startForeground(BaseConstant.ONGOING_NOTIFICATION_ID, notification);
-            final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(BaseConstant.ONGOING_NOTIFICATION_ID, notification);
-            NotificationInfo notificationInfo=new NotificationInfo();
-            notificationInfo.setRemoteViews(notificationView);
-            notificationInfo.setId(BaseConstant.ONGOING_NOTIFICATION_ID);
-            notificationInfo.setNotification(notification);
-            notificationInfo.setManager(notificationManager);
-            info.setNotificationInfo(notificationInfo);
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    recordInfo.setTotalTime(recordInfo.getTotalTime() + 1000);
-                    notificationView.setTextViewText(R.id.notification_tv_record_time, FormatTime.calculateTimeString(recordInfo.getTotalTime()));
-                    mRecordHandler.postDelayed(this, 1000);
-                    recordInfo.setRunnable(this);
-                    notificationManager.notify(BaseConstant.ONGOING_NOTIFICATION_ID, notification);
-                }
-            };
-            mRecordHandler.postDelayed(runnable, 1000);
-        }
         return new RecordServiceBinder();
     }
 
     public class RecordServiceBinder extends Binder {
 
-        public void pauseRecorder(String id) {
-            ActivityInfo info = mActivityInfoMap.get(id);
-            if(info!=null){
-                mRecordHandler.removeCallbacks(info.getRecordInfo().getRunnable());
-                NotificationInfo notificationInfo=info.getNotificationInfo();
-                RemoteViews remoteViews=notificationInfo.getRemoteViews();
-                if(remoteViews!=null){
-                     remoteViews.setImageViewResource(R.id.notification_iv_pause,R.mipmap.record_start);
-                }
-                NotificationManager manager=notificationInfo.getManager();
-                manager.notify(notificationInfo.getId(),notificationInfo.getNotification());
+        //TODO：这里有点问题，如果是连续点击的话就会有问题；
+        public void startRecorder(ActivityInfo info) {
+            ActivityInfo activityInfo = cloneActivityInfo(info);
+            mActivityInfoMap.put(info.getId(), activityInfo);
+            if (activityInfo != null) {
+                showNotification(activityInfo);
             }
         }
 
-        public void resumeRecorder(String id){
-            ActivityInfo info=mActivityInfoMap.get(id);
-            mRecordHandler.postDelayed(info.getRecordInfo().getRunnable(),1000);
-            NotificationInfo notificationInfo=info.getNotificationInfo();
-            RemoteViews remoteViews=notificationInfo.getRemoteViews();
-            if(remoteViews!=null){
-                remoteViews.setImageViewResource(R.id.notification_iv_pause,R.mipmap.record_pause);
-            }
-            NotificationManager manager=notificationInfo.getManager();
-            manager.notify(notificationInfo.getId(),notificationInfo.getNotification());
-        }
-
-        public void stopRecorder(String id){
-            ActivityInfo info=mActivityInfoMap.get(id);
-            mRecordHandler.removeCallbacks(info.getRecordInfo().getRunnable());
-            NotificationInfo notificationInfo=info.getNotificationInfo();
-            NotificationManager manager=notificationInfo.getManager();
-            manager.cancel(notificationInfo.getId());
-            mActivityInfoMap.remove(id);
-            if(mActivityInfoMap.size()==0){
+        public void pauseRecorder(ActivityInfo info) {
+            ActivityInfo activityInfo = mActivityInfoMap.get(info.getId());
+            if (activityInfo != null) {
+                mRecordHandler.removeCallbacks(activityInfo.getRecordInfo().getRunnable());
+                NotificationInfo notificationInfo = activityInfo.getNotificationInfo();
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.cancel(notificationInfo.getId());
                 stopForeground(true);
             }
         }
+
+        public void resumeRecorder(ActivityInfo info) {
+            ActivityInfo activityInfo = mActivityInfoMap.get(info.getId());
+            if (activityInfo != null) {
+                if(info.getRecordInfo().getRecordState()==BaseConstant.STOP_STATE){
+                    activityInfo.getRecordInfo().setTotalTime(0);
+                }
+                mRecordHandler.postDelayed(activityInfo.getRecordInfo().getRunnable(), 1000);
+                NotificationInfo notificationInfo = activityInfo.getNotificationInfo();
+                if (notificationInfo != null) {
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.notify(notificationInfo.getId(), notificationInfo.getNotification());
+                }
+            }
+        }
+
+        public void stopRecorder(ActivityInfo info) {
+            ActivityInfo activityInfo = mActivityInfoMap.get(info.getId());
+            if (activityInfo != null) {
+                mRecordHandler.removeCallbacks(activityInfo.getRecordInfo().getRunnable());
+                NotificationInfo notificationInfo = activityInfo.getNotificationInfo();
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.cancel(notificationInfo.getId());
+                stopForeground(true);
+            }
+        }
+
+
+        private ActivityInfo cloneActivityInfo(ActivityInfo info) {
+            ActivityInfo activityInfo = new ActivityInfo();
+            RecordInfo recordInfo = new RecordInfo();
+            activityInfo.setFragmentTag(info.getFragmentTag());
+            activityInfo.setCreateTime(info.getCreateTime());
+            activityInfo.setNotificationInfo(info.getNotificationInfo());
+            activityInfo.setId(info.getId());
+            activityInfo.setName(info.getName());
+            activityInfo.setParentGroupId(info.getParentGroupId());
+            activityInfo.setType(info.getType());
+
+            recordInfo.setRecordState(info.getRecordInfo().getRecordState());
+            recordInfo.setBeginTime(info.getRecordInfo().getBeginTime());
+            recordInfo.setEndTime(info.getRecordInfo().getEndTime());
+            recordInfo.setDuration(info.getRecordInfo().getDuration());
+            recordInfo.setTotalTime(info.getRecordInfo().getTotalTime());
+
+            activityInfo.setRecordInfo(recordInfo);
+
+            return activityInfo;
+        }
+    }
+
+    private void showNotification(ActivityInfo info) {
+        final RecordInfo recordInfo = info.getRecordInfo();
+        final Notification notification = new Notification(R.mipmap.ic_launcher, null, 0);
+        final RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
+        notification.contentView = notificationView;
+
+        Intent pauseIntent = new Intent();
+        pauseIntent.putExtra("activityInfo", info);
+        pauseIntent.setAction(BaseConstant.NOTIFICATION_CLICK_PAUSE);
+        PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, 0);
+        notificationView.setOnClickPendingIntent(R.id.notification_iv_pause, pendingPauseIntent);
+
+        Intent stopIntent = new Intent();
+        stopIntent.putExtra("activityInfo", info);
+        stopIntent.setAction(BaseConstant.NOTIFICATION_CLICK_STOP);
+        PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
+        notificationView.setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
+
+        final NotificationInfo notificationInfo = new NotificationInfo();
+        notificationInfo.setRemoteViews(notificationView);
+        notificationInfo.setId(GenerateNotificationID.getID());
+        notificationInfo.setNotification(notification);
+        info.setNotificationInfo(notificationInfo);
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(notificationInfo.getId(), notification);
+
+        startForeground(notificationInfo.getId(), notification);
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                recordInfo.setTotalTime(recordInfo.getTotalTime() + 1000);
+                notificationView.setTextViewText(R.id.notification_tv_record_time, FormatTime.calculateTimeString(recordInfo.getTotalTime()));
+                mRecordHandler.postDelayed(this, 1000);
+                recordInfo.setRunnable(this);
+                notificationManager.notify(notificationInfo.getId(), notification);
+            }
+        };
+        recordInfo.setRunnable(runnable);
+        mRecordHandler.postDelayed(runnable, 1000);
     }
 
 }

@@ -1,8 +1,10 @@
 package tinker.cn.timemanager.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -69,6 +71,7 @@ public class ActivityFragment extends Fragment {
             }
         }
 
+
         //TODO:读取数据库里边的数据，思路是应该判断下mActivityInfo 是否为空，如果是的，应该是最开始的Fragment，否则的话应该是点击群组之后的进入的；
         if (mActivityInfo == null) {
 //            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{""}, BaseConstant.ORDER_BY_CREATE_TIME,BaseConstant.Activities.COLUMN_ID);
@@ -89,6 +92,10 @@ public class ActivityFragment extends Fragment {
         }
 
         ((MainActivity) getActivity()).getActivityInfoMap().put(getTag(), mActivityList);
+
+        Intent intent = new Intent(getActivity(), RecordService.class);
+        getActivity().startService(intent);
+        getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 
     @Nullable
@@ -191,7 +198,7 @@ public class ActivityFragment extends Fragment {
                 convertView = View.inflate(getActivity(), R.layout.item_activity_list_view, null);
                 recordInfo.setView(convertView);
             }
-            ImageView activityIconImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_icon);
+            final ImageView activityIconImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_icon);
             TextView activityNameTextView = (TextView) convertView.findViewById(R.id.item_tv_activity_name);
             final LinearLayout timeDisplayLinearLayout = (LinearLayout) convertView.findViewById(R.id.item_ll_activity_time_display);
             final TextView timeDisplayTextView = (TextView) convertView.findViewById(R.id.item_tv_activity_time_display);
@@ -229,11 +236,17 @@ public class ActivityFragment extends Fragment {
                     timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
                     mHandler.removeCallbacks(lastRunnable);
                     mHandler.postDelayed(recordInfo.getRunnable(), 1000);
+
+                    Intent intent = new Intent(getActivity(), RecordService.class);
+                    intent.putExtra("activityInfo", info);
+                    getActivity().startService(intent);
+                    getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
                 }
             } else {
                 activityIconImageView.setImageResource(R.mipmap.group_icon);
                 timeDisplayLinearLayout.setVisibility(View.INVISIBLE);
             }
+
 
 
             startImageView.setOnClickListener(new View.OnClickListener() {
@@ -249,29 +262,31 @@ public class ActivityFragment extends Fragment {
                         recordInfo.setBeginTime(System.currentTimeMillis());
                         DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.FIRST_UPDATE_RECORD_TIME_WHERE_CONDITION, conditionArgs);
 
-                        Intent intent = new Intent(getActivity(), RecordService.class);
-                        intent.putExtra("activityInfo", info);
-                        getActivity().startService(intent);
-                        getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
-                    }
-                    if (recordInfo.getRecordState() == BaseConstant.STOP_STATE) {
+                        if(mServiceBinder!=null){
+                            mServiceBinder.startRecorder(info);
+                        }
+
+                    }else if (recordInfo.getRecordState() == BaseConstant.STOP_STATE) {
                         //开始记录活动时间，并且是一条新的记录
                         timeDisplayTextView.setVisibility(View.VISIBLE);
                         stopImageView.setVisibility(View.VISIBLE);
                         recordInfo.setTotalTime(0);
                         timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
                         mHandler.postDelayed(runnable, 1000);
+                        if(mServiceBinder!=null){
+                            mServiceBinder.resumeRecorder(info);
+                        }
                         info.setCreateTime(System.currentTimeMillis());
                         recordInfo.setBeginTime(System.currentTimeMillis());
                         DaoManager.getInstance().addActivity(info);
-                    }
-
-                    if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
+                    }else if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
                         //TODO:设置开始的图片
                         startImageView.setImageResource(R.mipmap.record_start);
                         mHandler.removeCallbacks(recordInfo.getRunnable());
                         //暂停的时候也需要暂停通知中的时间显示；
-                        mServiceBinder.pauseRecorder(info.getId());
+                        if(mServiceBinder!=null){
+                            mServiceBinder.pauseRecorder(info);
+                        }
                         recordInfo.setRecordState(BaseConstant.PAUSE_STATE);
                         updateInfo(position, recordInfo);
 
@@ -286,15 +301,13 @@ public class ActivityFragment extends Fragment {
                         //TODO:如果是暂停了又开始，那么就需要重新计算持续时间（数据库里边的数据），但是显示的却是累积 的时间；
 
                         //这段代码的目的是第一次进入app的时候需要bind service
-                        Intent intent = new Intent(getActivity(), RecordService.class);
-                        intent.putExtra("activityInfo", info);
-                        getActivity().startService(intent);
-                        getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
 
                         startImageView.setImageResource(R.mipmap.record_pause);
                         mHandler.postDelayed(runnable, 1000);
                         //再次开始计时
-                        mServiceBinder.resumeRecorder(info.getId());
+                        if(mServiceBinder!=null){
+                            mServiceBinder.resumeRecorder(info);
+                        }
                         recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
                         updateInfo(position, recordInfo);
 
@@ -312,8 +325,9 @@ public class ActivityFragment extends Fragment {
                     timeDisplayTextView.setVisibility(View.INVISIBLE);
                     startImageView.setImageResource(R.mipmap.record_start);
                     mHandler.removeCallbacks(runnable);
-                    mServiceBinder.stopRecorder(info.getId());
-
+                    if(mServiceBinder!=null){
+                        mServiceBinder.stopRecorder(info);
+                    }
                     updateInfo(position, recordInfo);
                     if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
                         recordInfo.setEndTime(System.currentTimeMillis());
@@ -323,6 +337,58 @@ public class ActivityFragment extends Fragment {
                     recordInfo.setRecordState(BaseConstant.STOP_STATE);
                 }
             });
+            IntentFilter pauseIntentFilter=new IntentFilter(BaseConstant.NOTIFICATION_CLICK_PAUSE);
+            getActivity().registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ActivityInfo activityInfo=intent.getParcelableExtra("activityInfo");
+                    if(activityInfo!=null){
+                        if(activityInfo.getId().equals(info.getId())){
+                            if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
+                                //TODO:设置开始的图片
+                                startImageView.setImageResource(R.mipmap.record_start);
+                                mHandler.removeCallbacks(recordInfo.getRunnable());
+                                if(mServiceBinder!=null){
+                                    mServiceBinder.pauseRecorder(info);
+                                }
+                                recordInfo.setRecordState(BaseConstant.PAUSE_STATE);
+                                updateInfo(position, recordInfo);
+
+                                recordInfo.setEndTime(System.currentTimeMillis());
+                                recordInfo.setDuration(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                                //之前的totalTime加上这次的持续时间；
+//                                    recordInfo.setTotalTime(recordInfo.getTotalTime()+recordInfo.getDuration());
+                                DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
+                            }
+                        }
+                    }
+                }
+            },pauseIntentFilter);
+            IntentFilter stopIntentFilter=new IntentFilter(BaseConstant.NOTIFICATION_CLICK_STOP);
+            getActivity().registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ActivityInfo activityInfo=intent.getParcelableExtra("activityInfo");
+                    if(activityInfo!=null){
+                        if(activityInfo.getId().equals(info.getId())){
+                            stopImageView.setVisibility(View.INVISIBLE);
+                            timeDisplayTextView.setVisibility(View.INVISIBLE);
+                            startImageView.setImageResource(R.mipmap.record_start);
+                            mHandler.removeCallbacks(runnable);
+                            if(mServiceBinder!=null){
+                                mServiceBinder.stopRecorder(info);
+                            }
+                            updateInfo(position, recordInfo);
+                            if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
+                                recordInfo.setEndTime(System.currentTimeMillis());
+                                recordInfo.setDuration(recordInfo.getEndTime() - recordInfo.getBeginTime());
+                                DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
+                            }
+                            recordInfo.setRecordState(BaseConstant.STOP_STATE);
+                        }
+                    }
+                }
+            },stopIntentFilter);
             return convertView;
         }
     }
@@ -347,16 +413,6 @@ public class ActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        //TODO:这个需要改善下，把这个放在第一次点击某一个活动的时候；
-//        Cursor cursor=DaoManager.getInstance().getActivityInfo(BaseConstant.GET_RECORDING_STATE_ACTIVITY,new String[]{String.valueOf(BaseConstant.RECORDING_STATE)});
-//        mActivityList=DaoManager.getInstance().parseCursor(cursor);
-//        ArrayList<ActivityInfo> arrayList=new ArrayList<>();
-//        if(mActivityList!=null){
-//            for (ActivityInfo info:mActivityList){
-//                  arrayList.add(info);
-//            }
-//        }
-
     }
 
     private class RecordServiceConnection implements ServiceConnection {

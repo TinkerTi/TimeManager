@@ -1,7 +1,6 @@
 package tinker.cn.timemanager.model;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.widget.RemoteViews;
 
 /**
@@ -13,7 +12,6 @@ public class NotificationInfo {
     private int id;
     private Notification notification;
     private RemoteViews remoteViews;
-    private NotificationManager manager;
 
     public int getId() {
         return id;
@@ -31,13 +29,6 @@ public class NotificationInfo {
         this.remoteViews = remoteViews;
     }
 
-    public NotificationManager getManager() {
-        return manager;
-    }
-
-    public void setManager(NotificationManager manager) {
-        this.manager = manager;
-    }
 
     public Notification getNotification() {
         return notification;

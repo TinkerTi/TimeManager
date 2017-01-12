@@ -10,6 +10,9 @@ import android.provider.BaseColumns;
 
 public final class BaseConstant {
 
+    public static final String NOTIFICATION_CLICK_PAUSE="notification_click_pause";
+    public static final String NOTIFICATION_CLICK_STOP="notification_clikc_stop";
+
     public static final String DB_NAME="activityInfo";
     public static final int DB_VERSION=1;
 
@@ -27,7 +30,6 @@ public final class BaseConstant {
     public static final int PAUSE_STATE=2;
     public static final int STOP_STATE=3;
 
-    public static final int ONGOING_NOTIFICATION_ID=0;
 
     public static final String RAW_QUERY_SELECT_MAX_TOTAL_TIME="select "
             +Activities._ID+","
