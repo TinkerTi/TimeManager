@@ -11,6 +11,7 @@ import android.view.View;
 public class RecordInfo implements Parcelable{
 
     private Runnable runnable;
+    private Runnable serviceRunnable;
     private View view;
 
     private long duration;
@@ -109,5 +110,14 @@ public class RecordInfo implements Parcelable{
 
     public void setTotalTime(long totalTime) {
         this.totalTime = totalTime;
+    }
+
+
+    public Runnable getServiceRunnable() {
+        return serviceRunnable;
+    }
+
+    public void setServiceRunnable(Runnable serviceRunnable) {
+        this.serviceRunnable = serviceRunnable;
     }
 }

@@ -11,6 +11,6 @@ public class GenerateNotificationID {
     private static final AtomicInteger counter=new AtomicInteger();
 
     public static int getID(){
-        return counter.decrementAndGet();
+        return counter.getAndIncrement()+1;
     }
 }
