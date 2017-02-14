@@ -66,7 +66,7 @@ public class DaoManager {
                         recordInfo.setRecordState(cursor.getInt(8));
                         info.setRecordInfo(recordInfo);
                         info.setCreateTime(cursor.getLong(9));
-                        recordInfo.setTotalTime(cursor.getLong(7));
+                        recordInfo.setTotalTime(cursor.getLong(10));
                         infoList.add(info);
                     } while (cursor.moveToNext());
                 }

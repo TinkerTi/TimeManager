@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tinker.cn.timemanager.R;
+import tinker.cn.timemanager.activity.ActivityDetailActivity;
 import tinker.cn.timemanager.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
@@ -55,6 +56,10 @@ public class ActivityFragment extends Fragment {
 
     private RecordService.RecordServiceBinder mServiceBinder;
 
+    private BroadcastReceiver mPauseTimeReceiver;
+    private BroadcastReceiver mStopTimeReceiver;
+    private RecordServiceConnection mServiceConnection;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,10 +77,14 @@ public class ActivityFragment extends Fragment {
         }
 
 
+        Intent intent = new Intent(getActivity(), RecordService.class);
+        getActivity().startService(intent);
+        mServiceConnection = new RecordServiceConnection();
+        getActivity().getApplicationContext().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
         //TODO:读取数据库里边的数据，思路是应该判断下mActivityInfo 是否为空，如果是的，应该是最开始的Fragment，否则的话应该是点击群组之后的进入的；
         if (mActivityInfo == null) {
-//            Cursor cursor = DaoManager.getInstance().getActivityInfo(null, BaseConstant.PARENT_GROUP_SELECTION, new String[]{""}, BaseConstant.ORDER_BY_CREATE_TIME,BaseConstant.Activities.COLUMN_ID);
-            Cursor cursor = DaoManager.getInstance().getActivityInfo(new String[]{""});
+            Cursor cursor = DaoManager.getInstance().getActivityInfo(new String[]{""});//根据parentGroupId所属群组来判断，如果是单个活动或者群组，则为空""，否则为所属群组id
             List<ActivityInfo> activityInfoList = DaoManager.getInstance().parseCursor(cursor);
             if (activityInfoList.size() > 0) {
                 for (ActivityInfo info : activityInfoList) {
@@ -91,11 +100,9 @@ public class ActivityFragment extends Fragment {
             mActivityList = DaoManager.getInstance().parseCursor(cursor);
         }
 
+
         ((MainActivity) getActivity()).getActivityInfoMap().put(getTag(), mActivityList);
 
-        Intent intent = new Intent(getActivity(), RecordService.class);
-        getActivity().startService(intent);
-        getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 
     @Nullable
@@ -117,6 +124,7 @@ public class ActivityFragment extends Fragment {
                     final ActivityInfo info = (ActivityInfo) object;
                     if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
                         //TODO:点击进入对应activity的详情页面
+                        Intent intent = new Intent(getActivity(), ActivityDetailActivity.class);
                     } else {
                         ActivityFragment activityFragment = new ActivityFragment();
                         Bundle bundle = new Bundle();
@@ -187,7 +195,6 @@ public class ActivityFragment extends Fragment {
         public View getView(final int position, View convertView, ViewGroup parent) {
             final ActivityInfo info = (ActivityInfo) getItem(position);
             final RecordInfo recordInfo = info.getRecordInfo();
-            final Runnable runnable;
             convertView = recordInfo.getView();
             if (convertView == null) {
                 convertView = View.inflate(getActivity(), R.layout.item_activity_list_view, null);
@@ -201,21 +208,21 @@ public class ActivityFragment extends Fragment {
             final ImageView stopImageView = (ImageView) convertView.findViewById(R.id.item_iv_activity_stop);
             activityNameTextView.setText(info.getName());
 
-            runnable = new Runnable() {
-                @Override
-                public void run() {
-                    //TODO: 设置暂停的图片
-                    startImageView.setImageResource(R.mipmap.record_pause);
-                    recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
-                    recordInfo.setTotalTime(recordInfo.getTotalTime() + 1000);
-                    timeDisplayTextView.setText(FormatTime.calculateTimeString(recordInfo.getTotalTime()));
-                    recordInfo.setRunnable(this);
-                    updateInfo(position, recordInfo);
-                    mHandler.postDelayed(this, 1000);
-                }
-            };
-            final Runnable lastRunnable = recordInfo.getRunnable();
-            recordInfo.setRunnable(runnable);
+            if (recordInfo.getRunnable() == null) {
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        //TODO: 设置暂停的图片
+                        startImageView.setImageResource(R.mipmap.record_pause);
+                        recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
+                        timeDisplayTextView.setText(FormatTime.calculateTimeString(recordInfo.getTotalTime()));
+                        recordInfo.setRunnable(this);
+                        updateInfo(position, recordInfo);
+                        mHandler.postDelayed(this, 1000);
+                    }
+                };
+                recordInfo.setRunnable(runnable);
+            }
             //ui显示问题
             if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
                 activityIconImageView.setImageResource(R.mipmap.activity_icon);
@@ -229,13 +236,13 @@ public class ActivityFragment extends Fragment {
                 }
                 if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
                     timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
-                    mHandler.removeCallbacks(lastRunnable);
+                    mHandler.removeCallbacks(recordInfo.getRunnable());
                     mHandler.postDelayed(recordInfo.getRunnable(), 1000);
 
-                    Intent intent = new Intent(getActivity(), RecordService.class);
-                    intent.putExtra("activityInfo", info);
-                    getActivity().startService(intent);
-                    getActivity().getApplicationContext().bindService(intent, new RecordServiceConnection(), Context.BIND_AUTO_CREATE);
+                    if (mServiceBinder != null) {
+                        mServiceBinder.startRecorder(info);
+                    }
+
                 }
             } else {
                 activityIconImageView.setImageResource(R.mipmap.group_icon);
@@ -264,7 +271,7 @@ public class ActivityFragment extends Fragment {
                         stopImageView.setVisibility(View.VISIBLE);
                         recordInfo.setTotalTime(0);
                         timeDisplayTextView.setText(calculateTimeString(recordInfo.getTotalTime()));
-                        mHandler.postDelayed(runnable, 1000);
+                        mHandler.postDelayed(recordInfo.getRunnable(), 1000);
                         info.setCreateTime(System.currentTimeMillis());
                         recordInfo.setBeginTime(System.currentTimeMillis());
                         if (mServiceBinder != null) {
@@ -290,7 +297,7 @@ public class ActivityFragment extends Fragment {
                     } else if (recordInfo.getRecordState() == BaseConstant.PAUSE_STATE) {
                         //这段代码的目的是第一次进入app的时候需要bind service
                         startImageView.setImageResource(R.mipmap.record_pause);
-                        mHandler.postDelayed(runnable, 1000);
+                        mHandler.postDelayed(recordInfo.getRunnable(), 1000);
                         recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
                         updateInfo(position, recordInfo);
                         info.setCreateTime(System.currentTimeMillis());
@@ -310,7 +317,7 @@ public class ActivityFragment extends Fragment {
                     stopImageView.setVisibility(View.INVISIBLE);
                     timeDisplayTextView.setVisibility(View.INVISIBLE);
                     startImageView.setImageResource(R.mipmap.record_start);
-                    mHandler.removeCallbacks(runnable);
+                    mHandler.removeCallbacks(recordInfo.getRunnable());
                     updateInfo(position, recordInfo);
                     if (recordInfo.getRecordState() == BaseConstant.RECORDING_STATE) {
                         recordInfo.setEndTime(System.currentTimeMillis());
@@ -323,8 +330,10 @@ public class ActivityFragment extends Fragment {
                     DaoManager.getInstance().updateRecordInfo(recordInfo, BaseConstant.UPDATE_RECORD_TIME_WHERE_CONDITION, new String[]{String.valueOf(recordInfo.getBeginTime())});
                 }
             });
+
+
             IntentFilter pauseIntentFilter = new IntentFilter(BaseConstant.NOTIFICATION_CLICK_PAUSE);
-            getActivity().registerReceiver(new BroadcastReceiver() {
+            mPauseTimeReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     ActivityInfo activityInfo = intent.getParcelableExtra("activityInfo");
@@ -347,9 +356,16 @@ public class ActivityFragment extends Fragment {
                         }
                     }
                 }
-            }, pauseIntentFilter);
+            };
+            try {
+                getActivity().registerReceiver(mPauseTimeReceiver, pauseIntentFilter);
+            } catch (Exception e) {
+
+            }
+
+
             IntentFilter stopIntentFilter = new IntentFilter(BaseConstant.NOTIFICATION_CLICK_STOP);
-            getActivity().registerReceiver(new BroadcastReceiver() {
+            mStopTimeReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     ActivityInfo activityInfo = intent.getParcelableExtra("activityInfo");
@@ -363,7 +379,7 @@ public class ActivityFragment extends Fragment {
                                 recordInfo.setEndTime(System.currentTimeMillis());
                                 recordInfo.setDuration(recordInfo.getEndTime() - recordInfo.getBeginTime());
                             }
-                            mHandler.removeCallbacks(runnable);
+                            mHandler.removeCallbacks(recordInfo.getRunnable());
                             if (mServiceBinder != null) {
                                 mServiceBinder.stopRecorder(info);
                             }
@@ -372,7 +388,13 @@ public class ActivityFragment extends Fragment {
                         }
                     }
                 }
-            }, stopIntentFilter);
+            };
+            try {
+                getActivity().registerReceiver(mStopTimeReceiver, stopIntentFilter);
+            } catch (Exception e) {
+
+            }
+
             return convertView;
         }
     }
@@ -396,6 +418,15 @@ public class ActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (mPauseTimeReceiver != null) {
+            getActivity().unregisterReceiver(mPauseTimeReceiver);
+        }
+        if (mStopTimeReceiver != null) {
+            getActivity().unregisterReceiver(mStopTimeReceiver);
+        }
+        for (ActivityInfo info : mActivityList) {
+            mHandler.removeCallbacks(info.getRecordInfo().getRunnable());
+        }
     }
 
     private class RecordServiceConnection implements ServiceConnection {
@@ -403,6 +434,22 @@ public class ActivityFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceBinder = (RecordService.RecordServiceBinder) service;
+            List<ActivityInfo> tempList = new ArrayList<>();
+            tempList.addAll(mActivityList);
+            for (ActivityInfo info : tempList) {
+                if (mServiceBinder != null) {
+                    for (String id : mServiceBinder.getNotificationActivityID()) {
+                        if (info.getId().equals(id)) {
+                            ActivityInfo activityInfo = mServiceBinder.getActivityInfoById(id);
+                            mServiceBinder.cancelNotification(activityInfo);
+                            int index = tempList.indexOf(info);
+                            mActivityList.remove(index);
+                            mActivityList.add(index, activityInfo);
+                            mActivityListViewAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
         }
 
         @Override

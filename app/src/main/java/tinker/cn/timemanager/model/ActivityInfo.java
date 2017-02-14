@@ -20,10 +20,8 @@ public class ActivityInfo implements Parcelable {
 
     private String id;//每一个后动或者群组对应一个id；这个要个数据库中的每一排的唯一的id区分开
     private String name;    //活动或者群组名；
-    private int type;   //是活动还是群组，
+    private int type;   //是活动还是群组，0是活动，1是群组；
     private String parentGroupId;//所属群组，如果是单个活动或者群组，则为空""，否则为所属群组id
-
-
     private long createTime;
 
     public ActivityInfo() {
@@ -132,4 +130,6 @@ public class ActivityInfo implements Parcelable {
     public void setNotificationInfo(NotificationInfo notificationInfo) {
         this.notificationInfo = notificationInfo;
     }
+
+
 }

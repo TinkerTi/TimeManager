@@ -1,5 +1,6 @@
 package tinker.cn.timemanager.service;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,11 +9,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.widget.RemoteViews;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.model.ActivityInfo;
@@ -29,6 +39,8 @@ import tinker.cn.timemanager.utils.GenerateNotificationID;
 public class RecordService extends Service {
 
     private Handler mRecordHandler;
+    private Map<String, ActivityInfo> mActivityInfoMap;
+    private List<ActivityInfo> mActivityInfoList;
 
     @Override
     public void onCreate() {
@@ -36,6 +48,8 @@ public class RecordService extends Service {
         HandlerThread handlerThread = new HandlerThread("RecordHandlerThread");
         handlerThread.start();
         mRecordHandler = new Handler(handlerThread.getLooper());
+        mActivityInfoMap=new HashMap<>();
+        mActivityInfoList=new ArrayList<>();
     }
 
     @Override
@@ -49,7 +63,17 @@ public class RecordService extends Service {
         return new RecordServiceBinder();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public class RecordServiceBinder extends Binder {
+
+        public void cancelNotification(ActivityInfo info){
+            mRecordHandler.removeCallbacks(info.getRecordInfo().getServiceRunnable());
+            NotificationInfo notificationInfo = info.getNotificationInfo();
+            setClickIntent(info);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.cancel(notificationInfo.getId());
+            stopForeground(true);
+        }
 
         public void startRecorder(ActivityInfo info) {
             if (info != null) {
@@ -79,6 +103,8 @@ public class RecordService extends Service {
                     NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     manager.notify(notificationInfo.getId(), notificationInfo.getNotification());
                     startForeground(notificationInfo.getId(), notificationInfo.getNotification());
+                } else {
+                    showNotification(info);
                 }
             }
         }
@@ -89,14 +115,30 @@ public class RecordService extends Service {
                 mRecordHandler.removeCallbacks(info.getRecordInfo().getServiceRunnable());
                 NotificationInfo notificationInfo = info.getNotificationInfo();
                 NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(notificationInfo.getId());
-                stopForeground(true);
+                if (notificationInfo != null) {
+                    manager.cancel(notificationInfo.getId());
+                    stopForeground(true);
+                }
             }
+        }
+
+        public Set<String> getNotificationActivityID(){
+            return mActivityInfoMap.keySet();
+        }
+
+        public ActivityInfo getActivityInfoById(String id){
+            return mActivityInfoMap.get(id);
+        }
+
+        public List<ActivityInfo> getActivityInfos(){
+            return mActivityInfoList;
         }
 
     }
 
-    private void showNotification(ActivityInfo info) {
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void showNotification(final ActivityInfo info) {
         final RecordInfo recordInfo = info.getRecordInfo();
         final Notification notification = new Notification(R.mipmap.ic_launcher, null, 0);
         final RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
@@ -121,15 +163,21 @@ public class RecordService extends Service {
         PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
 
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("activityInfo", info);
+        notification.extras = bundle;
+
 
         final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(notificationInfo.getId());
         notificationManager.notify(notificationInfo.getId(), notification);
 
         startForeground(notificationInfo.getId(), notification);
-
+        //TODO:需要post出去自己的实时状态，，Fragment在在需要的时候，来更新自己的状态；
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                recordInfo.setTotalTime(recordInfo.getTotalTime() + 1000);
                 notificationView.setTextViewText(R.id.notification_tv_record_time, FormatTime.calculateTimeString(recordInfo.getTotalTime()));
                 mRecordHandler.postDelayed(this, 1000);
                 recordInfo.setServiceRunnable(this);
@@ -138,25 +186,30 @@ public class RecordService extends Service {
         };
         recordInfo.setServiceRunnable(runnable);
         mRecordHandler.postDelayed(runnable, 1000);
+
+        mActivityInfoMap.put(info.getId(),info);
+        mActivityInfoList.add(info);
     }
 
 
     private void setClickIntent(ActivityInfo info) {
-        Intent pauseIntent = new Intent();
-        pauseIntent.putExtra("activityInfo", info);
-        pauseIntent.setAction(BaseConstant.NOTIFICATION_CLICK_PAUSE);
-        PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(this, info.getNotificationInfo().getId(), pauseIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-
-        Intent stopIntent = new Intent();
-        stopIntent.putExtra("activityInfo", info);
-        stopIntent.setAction(BaseConstant.NOTIFICATION_CLICK_STOP);
-        PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, info.getNotificationInfo().getId(), stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         if (info.getNotificationInfo() != null) {
+            Intent pauseIntent = new Intent();
+            pauseIntent.putExtra("activityInfo", info);
+            pauseIntent.setAction(BaseConstant.NOTIFICATION_CLICK_PAUSE);
+            PendingIntent pendingPauseIntent = PendingIntent.getBroadcast(this, info.getNotificationInfo().getId(), pauseIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            Intent stopIntent = new Intent();
+            stopIntent.putExtra("activityInfo", info);
+            stopIntent.setAction(BaseConstant.NOTIFICATION_CLICK_STOP);
+            PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, info.getNotificationInfo().getId(), stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             info.getNotificationInfo().getRemoteViews().setOnClickPendingIntent(R.id.notification_iv_pause, pendingPauseIntent);
             info.getNotificationInfo().getRemoteViews().setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
-
         }
+
     }
+
+
 
 }

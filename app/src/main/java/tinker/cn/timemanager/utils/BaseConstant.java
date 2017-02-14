@@ -11,7 +11,9 @@ import android.provider.BaseColumns;
 public final class BaseConstant {
 
     public static final String NOTIFICATION_CLICK_PAUSE="notification_click_pause";
-    public static final String NOTIFICATION_CLICK_STOP="notification_clikc_stop";
+    public static final String NOTIFICATION_CLICK_STOP="notification_click_stop";
+    public static final String NOTIFICATION_REAL_TIME="notification_real_time";
+
 
     public static final String DB_NAME="activityInfo";
     public static final int DB_VERSION=1;
