@@ -125,6 +125,7 @@ public class ActivityFragment extends Fragment {
                     if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
                         //TODO:点击进入对应activity的详情页面
                         Intent intent = new Intent(getActivity(), ActivityDetailActivity.class);
+                        startActivity(intent);
                     } else {
                         ActivityFragment activityFragment = new ActivityFragment();
                         Bundle bundle = new Bundle();

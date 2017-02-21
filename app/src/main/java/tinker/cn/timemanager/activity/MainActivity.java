@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,12 +22,22 @@ import tinker.cn.timemanager.fragment.MeFragment;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.utils.BaseConstant;
 import tinker.cn.timemanager.widget.FragmentViewPager;
+import tinker.cn.timemanager.widget.TabIndicatorItemView;
 
 
-public class MainActivity extends FragmentActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener {
+public class MainActivity extends FragmentActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener, View.OnClickListener {
+
+    private static final int ACTIVITY_ITEM=0;
+    private static final int RECORD_ITEM=1;
+    private static final int MINE_ITEM=2;
 
     private FragmentViewPager mViewPager;
+    private TabIndicatorItemView activityTab;
+    private TabIndicatorItemView recordTab;
+    private TabIndicatorItemView meTab;
+
     private Map<String, List<ActivityInfo>> mActivityInfoMap;
+
 
 
     @Override
@@ -49,10 +61,35 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
         fragmentList.add(new MeFragment());
         MainFragmentPagerAdapter pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(), fragmentList);
         mViewPager.setAdapter(pagerAdapter);
+        mViewPager.setCurrentItem(ACTIVITY_ITEM);
+        activityTab.setSelected(true);
     }
 
     private void initView() {
         mViewPager = (FragmentViewPager) findViewById(R.id.ac_vp_view_pager);
+        activityTab=(TabIndicatorItemView)findViewById(R.id.tab_activity);
+        recordTab=(TabIndicatorItemView)findViewById(R.id.tab_record);
+        meTab=(TabIndicatorItemView)findViewById(R.id.tab_me);
+        activityTab.setOnClickListener(this);
+        recordTab.setOnClickListener(this);
+        meTab.setOnClickListener(this);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setSelectedTabIndicatorItem(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
     }
 
     @Override
@@ -86,6 +123,8 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
         return mActivityInfoMap.get(tag);
     }
 
+
+
     private class MainFragmentPagerAdapter extends FragmentPagerAdapter {
 
         private List<Fragment> fragmentList;
@@ -116,4 +155,47 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
         return mActivityInfoMap;
     }
 
+    private void setSelectedTabIndicatorItem(int position){
+        switch (position){
+            case  ACTIVITY_ITEM:
+                activityTab.setSelected(true);
+                recordTab.setSelected(false);
+                meTab.setSelected(false);
+                break;
+            case RECORD_ITEM:
+                activityTab.setSelected(false);
+                recordTab.setSelected(true);
+                meTab.setSelected(false);
+                break;
+            case MINE_ITEM:
+                activityTab.setSelected(false);
+                recordTab.setSelected(false);
+                meTab.setSelected(true);
+
+                break;
+        }
+    }
+    @Override
+    public void onClick(View v) {
+       switch (v.getId()){
+           case R.id.tab_activity:
+               activityTab.setSelected(true);
+               recordTab.setSelected(false);
+               meTab.setSelected(false);
+               mViewPager.setCurrentItem(0);
+               break;
+           case R.id.tab_record:
+               activityTab.setSelected(false);
+               recordTab.setSelected(true);
+               meTab.setSelected(false);
+               mViewPager.setCurrentItem(1);
+               break;
+           case R.id.tab_me:
+               activityTab.setSelected(false);
+               recordTab.setSelected(false);
+               meTab.setSelected(true);
+               mViewPager.setCurrentItem(2);
+               break;
+       }
+    }
 }
