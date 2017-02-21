@@ -98,4 +98,9 @@
         <attr name="IndicatorButton" format="reference"/>
         <attr name="IndicatorText" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="AddImageButton">
+        <attr name="AddButtonBackground" format="reference"/>
+        <attr name="AddButtonImageSrc" format="reference"/>
+    </declare-styleable>
 </resources>

@@ -22,29 +22,31 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/ll_indicator"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="60dp"
+        android:gravity="center_vertical">
         <tinker.cn.timemanager.widget.TabIndicatorItemView
             android:id="@+id/tab_activity"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             custom:IndicatorButton="@mipmap/activity_icon"
-            custom:IndicatorText="@string/bottom_text_view_activity"/>
+            custom:IndicatorText="@string/bottom_text_view_activity" />
         <tinker.cn.timemanager.widget.TabIndicatorItemView
             android:id="@+id/tab_record"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             custom:IndicatorButton="@mipmap/group_icon"
-            custom:IndicatorText="@string/bottom_text_view_month_detail"/>
+            custom:IndicatorText="@string/bottom_text_view_month_detail" />
         <tinker.cn.timemanager.widget.TabIndicatorItemView
             android:id="@+id/tab_me"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             custom:IndicatorText="@string/bottom_text_view_me"
-            custom:IndicatorButton="@mipmap/activity_icon"/>
+            custom:IndicatorButton="@mipmap/activity_icon" />
     </LinearLayout>
     <!--底部布局-->
     <!--<include layout="@layout/layout_main_bottom" />-->
