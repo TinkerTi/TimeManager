@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,10 +32,12 @@ import tinker.cn.timemanager.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
 import tinker.cn.timemanager.service.RecordService;
+import tinker.cn.timemanager.utils.AppContext;
 import tinker.cn.timemanager.utils.BaseConstant;
 import tinker.cn.timemanager.utils.DaoManager;
 import tinker.cn.timemanager.utils.FormatTime;
 import tinker.cn.timemanager.widget.ActivityListView;
+import tinker.cn.timemanager.widget.AddImageButton;
 
 import static tinker.cn.timemanager.utils.FormatTime.calculateTimeString;
 
@@ -76,6 +79,19 @@ public class ActivityFragment extends Fragment {
             }
         }
 
+        if(createTag==BaseConstant.CREATE_ACTIVITY_ONLY){
+            getActivity().findViewById(R.id.iv_navigate_back).setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.iv_navigate_back).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getFragmentManager().popBackStack("groupDetailFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    getActivity().findViewById(R.id.iv_navigate_back).setVisibility(View.GONE);
+                }
+            });
+        } else {
+            getActivity().findViewById(R.id.iv_navigate_back).setVisibility(View.GONE);
+        }
+
 
         Intent intent = new Intent(getActivity(), RecordService.class);
         getActivity().startService(intent);
@@ -110,7 +126,7 @@ public class ActivityFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fr_activity_list, container, false);
 
-        ImageView imageView = (ImageView) view.findViewById(R.id.fr_iv_add_activity);
+        AddImageButton imageView = (AddImageButton) view.findViewById(R.id.fr_iv_add_activity);
         mListView = (ActivityListView) view.findViewById(R.id.fr_lv_activity_list);
         mActivityListViewAdapter = new ActivityListViewAdapter();
         mListView.setAdapter(mActivityListViewAdapter);
@@ -134,7 +150,7 @@ public class ActivityFragment extends Fragment {
                         activityFragment.setArguments(bundle);
                         getActivity().getSupportFragmentManager()
                                 .beginTransaction()
-                                .addToBackStack(null)
+                                .addToBackStack("groupDetailFragment")
                                 .replace(R.id.ac_fl_view_pager_container, activityFragment, info.getName())
                                 .commit();
                     }
@@ -428,6 +444,8 @@ public class ActivityFragment extends Fragment {
         for (ActivityInfo info : mActivityList) {
             mHandler.removeCallbacks(info.getRecordInfo().getRunnable());
         }
+
+        AppContext.getInstance().popFragment();
     }
 
     private class RecordServiceConnection implements ServiceConnection {

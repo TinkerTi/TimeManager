@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <!--顶部布局-->
-    <include layout="@layout/layout_main_top" />
+    <!--<include layout="@layout/layout_main_top" />-->
 
     <FrameLayout
         android:id="@+id/ac_fl_view_pager_container"

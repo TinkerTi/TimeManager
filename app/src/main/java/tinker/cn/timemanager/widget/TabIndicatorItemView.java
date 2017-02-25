@@ -39,6 +39,7 @@ public class TabIndicatorItemView extends LinearLayout {
         indicatorButtonImageView.setImageDrawable(drawable);
         indicatorTextView.setText(text);
 
+        typedArray.recycle();
     }
 
     @Override

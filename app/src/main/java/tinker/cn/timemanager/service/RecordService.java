@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import tinker.cn.timemanager.R;
+import tinker.cn.timemanager.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.NotificationInfo;
 import tinker.cn.timemanager.model.RecordInfo;
@@ -41,6 +42,7 @@ public class RecordService extends Service {
     private Handler mRecordHandler;
     private Map<String, ActivityInfo> mActivityInfoMap;
     private List<ActivityInfo> mActivityInfoList;
+
 
     @Override
     public void onCreate() {
@@ -86,9 +88,11 @@ public class RecordService extends Service {
                 mRecordHandler.removeCallbacks(info.getRecordInfo().getServiceRunnable());
                 NotificationInfo notificationInfo = info.getNotificationInfo();
                 setClickIntent(info);
-                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(notificationInfo.getId());
-                stopForeground(true);
+                if(notificationInfo!=null){
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.cancel(notificationInfo.getId());
+                    stopForeground(true);
+                }
             }
         }
 
@@ -140,9 +144,10 @@ public class RecordService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void showNotification(final ActivityInfo info) {
         final RecordInfo recordInfo = info.getRecordInfo();
-        final Notification notification = new Notification(R.mipmap.ic_launcher, null, 0);
+        final Notification notification = new Notification();
         final RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
         notification.contentView = notificationView;
+        notification.icon=R.mipmap.ic_launcher;
 
         final NotificationInfo notificationInfo = new NotificationInfo();
         notificationInfo.setRemoteViews(notificationView);
@@ -162,6 +167,11 @@ public class RecordService extends Service {
         pauseIntent.setData(Uri.parse(String.valueOf(System.currentTimeMillis() + 1000)));
         PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
+
+        Intent startActivityIntent=new Intent(RecordService.this, MainActivity.class);
+        PendingIntent pendingIntent=PendingIntent.getActivity(getApplicationContext(),BaseConstant.NOTIFICATION_START_ACTIVITY,startActivityIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.contentIntent=pendingIntent;
+
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("activityInfo", info);

@@ -14,7 +14,8 @@
         android:gravity="center_vertical">
         <ImageView
             android:id="@+id/item_iv_activity_icon"
-            style="@style/item_activity_or_group_icon" />
+            style="@style/item_activity_or_group_icon"
+            android:visibility="gone"/>
         <!--有可能会有很长的名字会挤占后边控件的空间-->
         <TextView
             android:id="@+id/item_tv_activity_name"

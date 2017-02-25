@@ -1,8 +1,10 @@
 package tinker.cn.timemanager.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.view.Window;
+import android.widget.FrameLayout;
 
 import tinker.cn.timemanager.R;
 
@@ -10,12 +12,36 @@ import tinker.cn.timemanager.R;
  * Created by tiankui on 2/13/17.
  */
 
-public class BaseActivity extends Activity{
+public class BaseActivity extends FragmentActivity implements View.OnClickListener {
 
+    private FrameLayout viewContainer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.base_activity);
+        super.setContentView(R.layout.base_activity);
+        viewContainer=(FrameLayout)findViewById(R.id.ac_fl_base_container);
+        findViewById(R.id.iv_navigate_back).setOnClickListener(this);
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        View view=View.inflate(getBaseContext(),layoutResID,null);
+        setContentView(view);
+    }
+
+    @Override
+    public void setContentView(View view) {
+        viewContainer.addView(view);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.iv_navigate_back:
+                finish();
+                break;
+
+        }
     }
 }

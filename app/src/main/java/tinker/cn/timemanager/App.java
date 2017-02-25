@@ -2,6 +2,7 @@ package tinker.cn.timemanager;
 
 import android.app.Application;
 
+import tinker.cn.timemanager.utils.AppContext;
 import tinker.cn.timemanager.utils.DaoManager;
 
 /**
@@ -15,5 +16,6 @@ public class App extends Application{
         super.onCreate();
 
         DaoManager.getInstance().openDB(this,"01");
+        AppContext.init(getApplicationContext());
     }
 }

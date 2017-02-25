@@ -3,7 +3,6 @@ package tinker.cn.timemanager.activity;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -26,7 +25,7 @@ import tinker.cn.timemanager.widget.FragmentViewPager;
 import tinker.cn.timemanager.widget.TabIndicatorItemView;
 
 
-public class MainActivity extends FragmentActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener, View.OnClickListener {
+public class MainActivity extends BaseActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener, View.OnClickListener {
 
     private static final int ACTIVITY_ITEM = 0;
     private static final int RECORD_ITEM = 1;
@@ -68,6 +67,7 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
     }
 
     private void initView() {
+        findViewById(R.id.iv_navigate_back).setVisibility(View.GONE);
         mViewPager = (FragmentViewPager) findViewById(R.id.ac_vp_view_pager);
         indicator = (LinearLayout) findViewById(R.id.ll_indicator);
         activityTab = (TabIndicatorItemView) findViewById(R.id.tab_activity);
@@ -166,12 +166,16 @@ public class MainActivity extends FragmentActivity implements CreateActivityGrou
         switch (v.getId()) {
             case R.id.tab_activity:
                 mViewPager.setCurrentItem(0);
+                getSupportFragmentManager().popBackStack("groupDetailFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 break;
             case R.id.tab_record:
                 mViewPager.setCurrentItem(1);
+//                AppContext.getInstance().popFragment();
+                getSupportFragmentManager().popBackStack("groupDetailFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 break;
             case R.id.tab_me:
                 mViewPager.setCurrentItem(2);
+                getSupportFragmentManager().popBackStack("groupDetailFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 break;
         }
     }

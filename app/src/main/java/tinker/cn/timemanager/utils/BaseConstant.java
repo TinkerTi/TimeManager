@@ -14,6 +14,8 @@ public final class BaseConstant {
     public static final String NOTIFICATION_CLICK_STOP="notification_click_stop";
     public static final String NOTIFICATION_REAL_TIME="notification_real_time";
 
+    public static final int NOTIFICATION_START_ACTIVITY=111;
+
 
     public static final String DB_NAME="activityInfo";
     public static final int DB_VERSION=1;
