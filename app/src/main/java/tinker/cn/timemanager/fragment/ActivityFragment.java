@@ -126,7 +126,7 @@ public class ActivityFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fr_activity_list, container, false);
 
-        AddImageButton imageView = (AddImageButton) view.findViewById(R.id.fr_iv_add_activity);
+        AddImageButton addImageView = (AddImageButton) view.findViewById(R.id.fr_iv_add_activity);
         mListView = (ActivityListView) view.findViewById(R.id.fr_lv_activity_list);
         mActivityListViewAdapter = new ActivityListViewAdapter();
         mListView.setAdapter(mActivityListViewAdapter);
@@ -157,7 +157,7 @@ public class ActivityFragment extends Fragment {
                 }
             }
         });
-        imageView.setOnClickListener(new View.OnClickListener() {
+        addImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (createTag == BaseConstant.CREATE_ACTIVITY_OR_GROUP) {
@@ -348,7 +348,6 @@ public class ActivityFragment extends Fragment {
                 }
             });
 
-
             IntentFilter pauseIntentFilter = new IntentFilter(BaseConstant.NOTIFICATION_CLICK_PAUSE);
             mPauseTimeReceiver = new BroadcastReceiver() {
                 @Override
@@ -416,7 +415,6 @@ public class ActivityFragment extends Fragment {
         }
     }
 
-
     /**
      * 用于ui上的刷新
      *
@@ -449,7 +447,6 @@ public class ActivityFragment extends Fragment {
     }
 
     private class RecordServiceConnection implements ServiceConnection {
-
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mServiceBinder = (RecordService.RecordServiceBinder) service;

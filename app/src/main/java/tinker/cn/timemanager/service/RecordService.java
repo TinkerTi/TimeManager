@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -144,10 +143,16 @@ public class RecordService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void showNotification(final ActivityInfo info) {
         final RecordInfo recordInfo = info.getRecordInfo();
-        final Notification notification = new Notification();
+
         final RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification_content_view);
-        notification.contentView = notificationView;
-        notification.icon=R.mipmap.ic_launcher;
+        Intent startActivityIntent=new Intent(RecordService.this, MainActivity.class);
+        PendingIntent pendingIntent=PendingIntent.getActivity(getApplicationContext(),BaseConstant.NOTIFICATION_START_ACTIVITY,startActivityIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        final Notification notification=new Notification.Builder(getApplicationContext())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContent(notificationView)
+                .setContentIntent(pendingIntent)
+                .build();
 
         final NotificationInfo notificationInfo = new NotificationInfo();
         notificationInfo.setRemoteViews(notificationView);
@@ -167,23 +172,10 @@ public class RecordService extends Service {
         pauseIntent.setData(Uri.parse(String.valueOf(System.currentTimeMillis() + 1000)));
         PendingIntent pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
-
-        Intent startActivityIntent=new Intent(RecordService.this, MainActivity.class);
-        PendingIntent pendingIntent=PendingIntent.getActivity(getApplicationContext(),BaseConstant.NOTIFICATION_START_ACTIVITY,startActivityIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.contentIntent=pendingIntent;
-
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("activityInfo", info);
-        notification.extras = bundle;
-
-
         final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(notificationInfo.getId());
         notificationManager.notify(notificationInfo.getId(), notification);
-
         startForeground(notificationInfo.getId(), notification);
-        //TODO:需要post出去自己的实时状态，，Fragment在在需要的时候，来更新自己的状态；
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -201,9 +193,7 @@ public class RecordService extends Service {
         mActivityInfoList.add(info);
     }
 
-
     private void setClickIntent(ActivityInfo info) {
-
         if (info.getNotificationInfo() != null) {
             Intent pauseIntent = new Intent();
             pauseIntent.putExtra("activityInfo", info);
@@ -217,7 +207,6 @@ public class RecordService extends Service {
             info.getNotificationInfo().getRemoteViews().setOnClickPendingIntent(R.id.notification_iv_pause, pendingPauseIntent);
             info.getNotificationInfo().getRemoteViews().setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
         }
-
     }
 
 
