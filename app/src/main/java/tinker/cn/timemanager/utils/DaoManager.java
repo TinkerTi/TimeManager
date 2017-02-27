@@ -67,6 +67,8 @@ public class DaoManager {
                         info.setRecordInfo(recordInfo);
                         info.setCreateTime(cursor.getLong(9));
                         recordInfo.setTotalTime(cursor.getLong(10));
+                        info.setOriginCreateTime(cursor.getLong(11));
+                        info.setTag(cursor.getString(12));
                         infoList.add(info);
                     } while (cursor.moveToNext());
                 }

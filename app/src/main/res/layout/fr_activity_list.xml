@@ -5,11 +5,16 @@
     android:layout_height="match_parent"
     android:background="#ffffff">
 
-    <tinker.cn.timemanager.widget.ActivityListView
-        android:id="@+id/fr_lv_activity_list"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:addStatesFromChildren="true" />
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/ll_activity_item_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#0ff00f"/>
+    </ScrollView>
 
     <tinker.cn.timemanager.widget.AddImageButton
         android:id="@+id/fr_iv_add_activity"
@@ -17,8 +22,8 @@
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="15dp"
         android:layout_marginBottom="15dp"
+        android:layout_marginRight="15dp"
         app:AddButtonBackground="@drawable/wi_add_button_background"
         app:AddButtonImageSrc="@drawable/wi_add_button_image" />
 </RelativeLayout>

@@ -100,24 +100,25 @@ public class MainActivity extends BaseActivity implements CreateActivityGroupDia
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialogFragment, ActivityInfo info) {
-        if (info == null) {
-            return;
-        }
-        List<ActivityInfo> activityInfo = mActivityInfoMap.get(info.getFragmentTag());
-        if (activityInfo == null) {
-            activityInfo = new ArrayList<>();
-        }
-
-        if (info.getParentGroupId().equals("") && info.getType() == BaseConstant.TYPE_ACTIVITY) {
-            activityInfo.add(0, info);
-        } else {
-            activityInfo.add(info);
-        }
-        mActivityInfoMap.put(info.getFragmentTag(), activityInfo);
+//        if (info == null) {
+//            return;
+//        }
+//        List<ActivityInfo> activityInfo = mActivityInfoMap.get(info.getFragmentTag());
+//        if (activityInfo == null) {
+//            activityInfo = new ArrayList<>();
+//        }
+//
+//        if (info.getParentGroupId().equals("") && info.getType() == BaseConstant.TYPE_ACTIVITY) {
+//            activityInfo.add(0, info);
+//        } else {
+//            activityInfo.add(info);
+//        }
+//        mActivityInfoMap.put(info.getFragmentTag(), activityInfo);
         ActivityFragment activityFragment = (ActivityFragment) getSupportFragmentManager().findFragmentByTag(info.getFragmentTag());
         if (activityFragment != null) {
-            activityFragment.updateList(activityInfo);
+            activityFragment.addActivity(info);
         }
+
     }
 
     @Override

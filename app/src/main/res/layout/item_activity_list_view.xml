@@ -1,47 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="45dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_height="45dp">
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
+        android:id="@+id/ll_activity_item_view"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
-        <ImageView
-            android:id="@+id/item_iv_activity_icon"
-            style="@style/item_activity_or_group_icon"
-            android:visibility="gone"/>
-        <!--有可能会有很长的名字会挤占后边控件的空间-->
-        <TextView
-            android:id="@+id/item_tv_activity_name"
-            style="@style/item_activity_or_group_name_style" />
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:id="@+id/item_iv_activity_icon"
+                style="@style/item_activity_or_group_icon"
+                android:visibility="gone"/>
+            <!--有可能会有很长的名字会挤占后边控件的空间-->
+            <TextView
+                android:id="@+id/item_tv_activity_name"
+                style="@style/item_activity_or_group_name_style" />
+        </LinearLayout>
+        <!--活动时间显示-->
+        <LinearLayout
+            android:id="@+id/item_ll_activity_time_display"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:visibility="visible"
+            android:visibility="visible">
+            <TextView
+                android:id="@+id/item_tv_activity_time_display"
+                tools:text="00:00:00"
+                style="@style/item_activity_record_time_text_view_style" />
+            <ImageView
+                android:id="@+id/item_iv_activity_start"
+                style="@style/item_activity_record_start_icon"
+                android:src="@mipmap/record_start"/>
+            <ImageView
+                android:id="@+id/item_iv_activity_stop"
+                style="@style/item_activity_record_stop_icon"
+                android:src="@mipmap/record_stop"/>
+        </LinearLayout>
     </LinearLayout>
-    <!--活动时间显示-->
-    <LinearLayout
-        android:id="@+id/item_ll_activity_time_display"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        tools:visibility="visible"
-        android:visibility="visible">
-        <TextView
-            android:id="@+id/item_tv_activity_time_display"
-            tools:text="00:00:00"
-             style="@style/item_activity_record_time_text_view_style" />
-        <ImageView
-            android:id="@+id/item_iv_activity_start"
-            style="@style/item_activity_record_start_icon"
-            android:src="@mipmap/record_start"/>
-        <ImageView
-            android:id="@+id/item_iv_activity_stop"
-            style="@style/item_activity_record_stop_icon"
-            android:src="@mipmap/record_stop"/>
-    </LinearLayout>
-</LinearLayout>
+</merge>

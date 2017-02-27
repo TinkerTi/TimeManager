@@ -46,12 +46,14 @@ public final class BaseConstant {
             +"sum("+Activities.COLUMN_DURATION+"),"
             +Activities.COLUMN_RECORD_STATE+","
             +Activities.COLUMN_CREATE_TIME+","
-            +Activities.COLUMN_TOTAL_TIME+" "
+            +Activities.COLUMN_TOTAL_TIME+","
+            +Activities.COLUMN_ORIGIN_CREATE_TIME+","
+            +Activities.COLUMN_TAG+" "
             +"from "+Activities.TABLE_NAME
             +" where "+Activities.COLUMN_PARENT_GROUP_ID
             +" = ?"
             +"group by "+Activities.COLUMN_ID
-            +" order by "+Activities.COLUMN_CREATE_TIME+" asc"
+            +" order by "+Activities.COLUMN_ORIGIN_CREATE_TIME+" desc"
             +";";
 
 
@@ -77,6 +79,8 @@ public final class BaseConstant {
         public static final String COLUMN_RECORD_STATE="recordState";
         public static final String COLUMN_CREATE_TIME="createTime";
         public static final String COLUMN_TOTAL_TIME="totalTime";
+        public static final String COLUMN_ORIGIN_CREATE_TIME="originCreateTime";
+        public static final String COLUMN_TAG="tag";
 
 
 
@@ -92,7 +96,9 @@ public final class BaseConstant {
                 +COLUMN_DURATION+" integer,"
                 +COLUMN_RECORD_STATE+" integer,"
                 +COLUMN_CREATE_TIME+" integer,"
-                +COLUMN_TOTAL_TIME+" integer"
+                +COLUMN_TOTAL_TIME+" integer,"
+                +COLUMN_ORIGIN_CREATE_TIME+" integer,"
+                +COLUMN_TAG+" text"
                 +");";
 
         public static final String ACTIVITIES_TABLE_ADD_INDEX="create index "

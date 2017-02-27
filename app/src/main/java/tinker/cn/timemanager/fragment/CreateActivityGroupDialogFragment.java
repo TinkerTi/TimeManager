@@ -44,6 +44,7 @@ public class CreateActivityGroupDialogFragment extends BaseDialogFragment{
                         info.setFragmentTag(fragmentTag);
                         info.setName(editText.getText().toString().trim());
                         info.setCreateTime(System.currentTimeMillis());
+                        info.setOriginCreateTime(System.currentTimeMillis());
                         info.setRecordInfo(new RecordInfo());
                         DaoManager.getInstance().addActivity(info);
                         if (mListener != null) {

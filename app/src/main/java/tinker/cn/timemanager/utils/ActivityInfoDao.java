@@ -49,6 +49,8 @@ public class ActivityInfoDao {
             contentValues.put(BaseConstant.Activities.COLUMN_END_TIME,recordInfo.getEndTime());
             contentValues.put(BaseConstant.Activities.COLUMN_DURATION,recordInfo.getDuration());
             contentValues.put(BaseConstant.Activities.COLUMN_RECORD_STATE,recordInfo.getRecordState());
+            contentValues.put(BaseConstant.Activities.COLUMN_ORIGIN_CREATE_TIME,info.getOriginCreateTime());
+            contentValues.put(BaseConstant.Activities.COLUMN_TAG,info.getTag());
             database.insert(BaseConstant.Activities.TABLE_NAME,null,contentValues);
         }
     }

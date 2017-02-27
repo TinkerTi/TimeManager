@@ -22,7 +22,10 @@ public class ActivityInfo implements Parcelable {
     private String name;    //活动或者群组名；
     private int type;   //是活动还是群组，0是活动，1是群组；
     private String parentGroupId;//所属群组，如果是单个活动或者群组，则为空""，否则为所属群组id
-    private long createTime;
+    private long createTime;//一次完整的时间记录中开始记录的时间（从start到stop的时间）
+
+    private long originCreateTime;//活动创建的时间
+    private String tag;//标识活动的类别，为日后的统计分类用；
 
     public ActivityInfo() {
     }
@@ -129,6 +132,24 @@ public class ActivityInfo implements Parcelable {
 
     public void setNotificationInfo(NotificationInfo notificationInfo) {
         this.notificationInfo = notificationInfo;
+    }
+
+
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public long getOriginCreateTime() {
+        return originCreateTime;
+    }
+
+    public void setOriginCreateTime(long originCreateTime) {
+        this.originCreateTime = originCreateTime;
     }
 
 
