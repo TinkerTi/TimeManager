@@ -29,7 +29,6 @@ public class NotificationInfo {
         this.remoteViews = remoteViews;
     }
 
-
     public Notification getNotification() {
         return notification;
     }

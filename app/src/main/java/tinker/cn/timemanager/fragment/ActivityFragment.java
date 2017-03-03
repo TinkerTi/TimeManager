@@ -24,9 +24,9 @@ import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.activity.ActivityDetailActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.service.RecordService;
-import tinker.cn.timemanager.utils.AppContext;
-import tinker.cn.timemanager.utils.BaseConstant;
-import tinker.cn.timemanager.utils.DaoManager;
+import tinker.cn.timemanager.AppContext;
+import tinker.cn.timemanager.model.BaseConstant;
+import tinker.cn.timemanager.db.DaoManager;
 import tinker.cn.timemanager.widget.AddImageButton;
 import tinker.cn.timemanager.widget.TimeRecordItemView;
 
@@ -39,8 +39,10 @@ import tinker.cn.timemanager.widget.TimeRecordItemView;
 public class ActivityFragment extends Fragment {
 
     private List<ActivityInfo> mActivityList;
+    List<ActivityInfo> tempList;
     private List<TimeRecordItemView> viewList;
     private int mGroupCount;
+    private int mActivityCount;
     private LinearLayout activityItemLinearLayout;
     private static Handler mHandler;
     private int createTag;
@@ -51,9 +53,7 @@ public class ActivityFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivityList = new ArrayList<>();
         viewList=new ArrayList<>();
-        mGroupCount=0;
         mHandler = new Handler(Looper.getMainLooper());
 
         Bundle bundle = getArguments();
@@ -85,6 +85,16 @@ public class ActivityFragment extends Fragment {
         mServiceConnection = new RecordServiceConnection();
         getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mActivityList = new ArrayList<>();
+        tempList=new ArrayList<>();
+        mGroupCount=0;
+        mActivityCount=0;
         //读取数据库里边的数据，思路是应该判断下mActivityInfo 是否为空，如果是的，应该是最开始的Fragment，否则的话应该是点击群组之后的进入的；
         if (mActivityInfo == null) {
             Cursor cursor = DaoManager.getInstance().getActivityInfo(new String[]{""});//根据parentGroupId所属群组来判断，如果是单个活动或者群组，则为空""，否则为所属群组id
@@ -92,7 +102,7 @@ public class ActivityFragment extends Fragment {
             if (activityInfoList.size() > 0) {
                 for (ActivityInfo info : activityInfoList) {
                     if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
-                        mActivityList.add(0, info);
+                        mActivityList.add(mActivityCount++, info);
                     } else {
                         mActivityList.add(mActivityList.size(), info);
                         mGroupCount++;
@@ -103,17 +113,15 @@ public class ActivityFragment extends Fragment {
             Cursor cursor = DaoManager.getInstance().getActivityInfo(new String[]{mActivityInfo.getId()});
             mActivityList = DaoManager.getInstance().parseCursor(cursor);
         }
-    }
 
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fr_activity_list, container, false);
         AddImageButton addImageView = (AddImageButton) view.findViewById(R.id.fr_iv_add_activity);
         activityItemLinearLayout = (LinearLayout) view.findViewById(R.id.ll_activity_item_container);
         for (ActivityInfo info : mActivityList) {
             initActivity(info);
         }
+        cancelNotificationIfNeeded();
+
         addImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,11 +149,7 @@ public class ActivityFragment extends Fragment {
         TimeRecordItemView itemView = new TimeRecordItemView(getActivity());
         itemView.setInfo(info, mHandler,mServiceBinder);
         viewList.add(itemView);
-        if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
-            activityItemLinearLayout.addView(itemView, 0);
-        } else {
-            activityItemLinearLayout.addView(itemView);
-        }
+        activityItemLinearLayout.addView(itemView);
         setListener(itemView);
     }
     public void addActivity(ActivityInfo info) {
@@ -162,7 +166,7 @@ public class ActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        for (ActivityInfo info : mActivityList) {
+        for (ActivityInfo info : tempList) {
             mHandler.removeCallbacks(info.getRecordInfo().getRunnable());
         }
         AppContext.getInstance().popFragment();
@@ -176,26 +180,28 @@ public class ActivityFragment extends Fragment {
             for (TimeRecordItemView view:viewList){
                 view.setServiceBinder(mServiceBinder);
             }
-            List<ActivityInfo> tempList=new ArrayList<>();
             tempList.addAll(mActivityList);
-            for (ActivityInfo info : tempList) {
+            for (ActivityInfo info : mActivityList) {
                 if (mServiceBinder != null) {
                     for (String id : mServiceBinder.getNotificationActivityID()) {
                         if (info.getId().equals(id)) {
                             ActivityInfo activityInfo = mServiceBinder.getActivityInfoById(id);
                             mServiceBinder.cancelNotification(activityInfo);
-                            int index = tempList.indexOf(info);
-                            mActivityList.remove(index);
-                            mActivityList.add(index,activityInfo);
+                            int index = mActivityList.indexOf(info);
+                            tempList.remove(index);
+                            tempList.add(index,activityInfo);
                             TimeRecordItemView timeRecordItemView = new TimeRecordItemView(getActivity());
                             timeRecordItemView.setInfo(activityInfo, mHandler,mServiceBinder);
                             setListener(timeRecordItemView);
-                            activityItemLinearLayout.removeViewAt(index);
-                            activityItemLinearLayout.addView(timeRecordItemView, index);
+                            if(index<activityItemLinearLayout.getChildCount()){
+                                activityItemLinearLayout.removeViewAt(index);
+                                activityItemLinearLayout.addView(timeRecordItemView, index);
+                            }
                         }
                     }
                 }
             }
+
         }
 
         @Override
@@ -204,15 +210,15 @@ public class ActivityFragment extends Fragment {
         }
     }
 
-    private void setListener(TimeRecordItemView itemView) {
+    private void setListener(final TimeRecordItemView itemView) {
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (v instanceof TimeRecordItemView) {
                     ActivityInfo info = ((TimeRecordItemView) v).getActivityInfo();
                     if (info.getType() == BaseConstant.TYPE_ACTIVITY) {
-                        //TODO:点击进入对应activity的详情页面
                         Intent intent = new Intent(getActivity(), ActivityDetailActivity.class);
+                        intent.putExtra("activityInfo",itemView.getActivityInfo());
                         startActivity(intent);
                     } else {
                         ActivityFragment activityFragment = new ActivityFragment();
@@ -238,6 +244,29 @@ public class ActivityFragment extends Fragment {
         });
     }
 
+    public void cancelNotificationIfNeeded(){
+        tempList.addAll(mActivityList);
+        for (ActivityInfo info : mActivityList) {
+            if (mServiceBinder != null) {
+                for (String id : mServiceBinder.getNotificationActivityID()) {
+                    if (info.getId().equals(id)) {
+                        ActivityInfo activityInfo = mServiceBinder.getActivityInfoById(id);
+                        mServiceBinder.cancelNotification(activityInfo);
+                        int index = mActivityList.indexOf(info);
+                        tempList.remove(index);
+                        tempList.add(index,activityInfo);
+                        TimeRecordItemView timeRecordItemView = new TimeRecordItemView(getActivity());
+                        timeRecordItemView.setInfo(activityInfo, mHandler,mServiceBinder);
+                        setListener(timeRecordItemView);
+                        if(index<activityItemLinearLayout.getChildCount()){
+                            activityItemLinearLayout.removeViewAt(index);
+                            activityItemLinearLayout.addView(timeRecordItemView, index);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 
 }

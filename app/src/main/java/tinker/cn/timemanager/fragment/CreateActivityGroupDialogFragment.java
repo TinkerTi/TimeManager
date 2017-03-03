@@ -13,8 +13,8 @@ import java.util.UUID;
 import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
-import tinker.cn.timemanager.utils.DaoManager;
-import tinker.cn.timemanager.utils.BaseConstant;
+import tinker.cn.timemanager.db.DaoManager;
+import tinker.cn.timemanager.model.BaseConstant;
 
 /**
  * Created by tiankui on 1/3/17.

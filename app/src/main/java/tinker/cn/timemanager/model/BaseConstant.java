@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.utils;
+package tinker.cn.timemanager.model;
 
 import android.provider.BaseColumns;
 
@@ -55,8 +55,6 @@ public final class BaseConstant {
             +"group by "+Activities.COLUMN_ID
             +" order by "+Activities.COLUMN_ORIGIN_CREATE_TIME+" desc"
             +";";
-
-
 
     public static final String FIRST_UPDATE_RECORD_TIME_WHERE_CONDITION= Activities.COLUMN_ID+" = ?";
 

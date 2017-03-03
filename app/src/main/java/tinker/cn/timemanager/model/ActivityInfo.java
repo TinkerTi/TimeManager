@@ -38,6 +38,8 @@ public class ActivityInfo implements Parcelable {
         type = in.readInt();
         parentGroupId = in.readString();
         createTime = in.readLong();
+        originCreateTime=in.readLong();
+        tag=in.readString();
     }
 
     @Override
@@ -49,6 +51,8 @@ public class ActivityInfo implements Parcelable {
         dest.writeInt(type);
         dest.writeString(parentGroupId);
         dest.writeLong(createTime);
+        dest.writeLong(originCreateTime);
+        dest.writeString(tag);
     }
 
     @Override

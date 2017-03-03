@@ -20,7 +20,7 @@ import tinker.cn.timemanager.fragment.CreateActivityGroupDialogFragment;
 import tinker.cn.timemanager.fragment.HistoryRecordsFragment;
 import tinker.cn.timemanager.fragment.MeFragment;
 import tinker.cn.timemanager.model.ActivityInfo;
-import tinker.cn.timemanager.utils.BaseConstant;
+import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.widget.FragmentViewPager;
 import tinker.cn.timemanager.widget.TabIndicatorItemView;
 

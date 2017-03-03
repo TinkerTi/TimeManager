@@ -1,8 +1,7 @@
-package tinker.cn.timemanager.utils;
+package tinker.cn.timemanager;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 
 import java.util.Stack;
 

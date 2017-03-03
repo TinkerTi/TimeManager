@@ -16,8 +16,8 @@ import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.RecordInfo;
 import tinker.cn.timemanager.service.RecordService;
-import tinker.cn.timemanager.utils.BaseConstant;
-import tinker.cn.timemanager.utils.DaoManager;
+import tinker.cn.timemanager.model.BaseConstant;
+import tinker.cn.timemanager.db.DaoManager;
 
 import static tinker.cn.timemanager.utils.FormatTime.calculateTimeString;
 

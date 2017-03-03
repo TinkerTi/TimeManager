@@ -1,10 +1,13 @@
-package tinker.cn.timemanager.utils;
+package tinker.cn.timemanager.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.io.File;
+
+import tinker.cn.timemanager.model.BaseConstant;
+import tinker.cn.timemanager.utils.DatabaseContext;
 
 /**
  * Created by tiankui on 1/5/17.
