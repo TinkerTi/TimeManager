@@ -3,17 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="test"-->
-        <!--android:layout_gravity="center"/>-->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lc_the_latest_seven_day_record"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"/>
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lc_the_latest_seven_week"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
 </LinearLayout>

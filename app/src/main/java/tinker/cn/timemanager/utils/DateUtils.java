@@ -11,7 +11,7 @@ import java.util.Date;
 public class DateUtils {
 
     // 获得当天0点时间
-    public static long getTimesMorning() {
+    public static long getTodayMorning() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.SECOND, 0);
@@ -20,7 +20,7 @@ public class DateUtils {
         return cal.getTimeInMillis();
     }
     // 获得当天24点时间
-    public static long getTimesNight() {
+    public static long getTodayNight() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 24);
         cal.set(Calendar.SECOND, 0);
@@ -30,16 +30,16 @@ public class DateUtils {
     }
 
     // 获得本周一0点时间
-    public static long getTimesWeekMorning() {
+    public static long getCurrentWeekMorning() {
         Calendar cal = Calendar.getInstance();
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return cal.getTimeInMillis();
     }
     // 获得本周日24点时间
-    public static long getTimesWeekNight() {
+    public static long getCurrentWeekNight() {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date(getTimesWeekMorning()));
+        cal.setTime(new Date(getCurrentWeekMorning()));
         cal.add(Calendar.DAY_OF_WEEK, 7);
         return cal.getTimeInMillis();
     }
@@ -47,14 +47,14 @@ public class DateUtils {
 
 
     // 获得本月第一天0点时间
-    public static long getTimesMonthMorning() {
+    public static long getCurrentMonthMorning() {
         Calendar cal = Calendar.getInstance();
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         return cal.getTimeInMillis();
     }
     // 获得本月最后一天24点时间
-    public static long getTimesMonthNight() {
+    public static long getCurrentMonthNight() {
         Calendar cal = Calendar.getInstance();
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -117,13 +117,13 @@ public class DateUtils {
     // 获得昨天0点时间
     public static long getYesterdaymorning() {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(getTimesMorning()-3600*24*1000);
+        cal.setTimeInMillis(getTodayMorning()-3600*24*1000);
         return cal.getTimeInMillis();
     }
     // 获得当天近7天时间
     public static long getWeekFromNow() {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis( getTimesMorning()-3600*24*1000*7);
+        cal.setTimeInMillis( getTodayMorning()-3600*24*1000*7);
         return cal.getTimeInMillis();
     }
 
@@ -131,7 +131,7 @@ public class DateUtils {
     //上月开始时间
     public static long getLastMonthStartMorning() {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date(getTimesMonthMorning()));
+        cal.setTime(new Date(getCurrentMonthMorning()));
         cal.add(Calendar.MONTH, -1);
         return cal.getTimeInMillis();
     }
