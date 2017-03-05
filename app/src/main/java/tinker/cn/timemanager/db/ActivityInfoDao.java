@@ -6,9 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import tinker.cn.timemanager.model.ActivityInfo;
-import tinker.cn.timemanager.model.RecordInfo;
 import tinker.cn.timemanager.model.BaseConstant;
-import tinker.cn.timemanager.utils.DateUtils;
+import tinker.cn.timemanager.model.RecordInfo;
 
 /**
  * Created by tiankui on 1/5/17.
@@ -87,9 +86,8 @@ public class ActivityInfoDao {
         return database.query(BaseConstant.Activities.TABLE_NAME, null, selection, args, null, null, null);
     }
 
-    public Cursor getTodayRecord(String id) {
-        long todayMorning = DateUtils.getTimesMorning();
-        long todayNight = DateUtils.getTimesNight();
+    public Cursor getSpecifiedTimeRecord(String id, String startTime, String endTime) {
+
         final String RAW_QUERY_SELECT_CURRENT_DAY_RECORD = "select "
                 + BaseConstant.Activities._ID + ","
                 + BaseConstant.Activities.COLUMN_ID + ","
@@ -98,21 +96,23 @@ public class ActivityInfoDao {
                 + BaseConstant.Activities.COLUMN_PARENT_GROUP_ID + ","
                 + BaseConstant.Activities.COLUMN_BEGIN_TIME + ","
                 + BaseConstant.Activities.COLUMN_END_TIME + ","
-                + BaseConstant.Activities.COLUMN_DURATION + " ,"
+                +"sum("+ BaseConstant.Activities.COLUMN_DURATION+"),"
                 + BaseConstant.Activities.COLUMN_RECORD_STATE + ","
                 + BaseConstant.Activities.COLUMN_CREATE_TIME + ","
                 + BaseConstant.Activities.COLUMN_TOTAL_TIME + ","
                 + BaseConstant.Activities.COLUMN_ORIGIN_CREATE_TIME + ","
                 + BaseConstant.Activities.COLUMN_TAG + " "
                 + "from " + BaseConstant.Activities.TABLE_NAME
-                + " where " +BaseConstant.Activities.COLUMN_ID
+                + " where "
+                +BaseConstant.Activities.COLUMN_ID
                 +" = ? "
                 +" and "
                 +BaseConstant.Activities.COLUMN_CREATE_TIME
                 + " between ? and ?"
+                +" group by "+ BaseConstant.Activities.COLUMN_ID
                 + " order by " + BaseConstant.Activities.COLUMN_CREATE_TIME + " asc"
                 + ";";
-        return database.rawQuery(RAW_QUERY_SELECT_CURRENT_DAY_RECORD, new String[]{id,String.valueOf(todayMorning), String.valueOf(todayNight)});
+        return database.rawQuery(RAW_QUERY_SELECT_CURRENT_DAY_RECORD, new String[]{id,startTime, endTime});
     }
 
 }

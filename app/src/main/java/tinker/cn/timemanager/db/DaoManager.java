@@ -88,7 +88,7 @@ public class DaoManager {
         return mActivityInfoDataBase.getActivityInfo(selection,args);
     }
 
-    public Cursor getTodayRecord(String id){
-        return mActivityInfoDataBase.getTodayRecord(id);
+    public Cursor getSpecifiedTimeRecord(String id, String startTime, String endTime){
+        return mActivityInfoDataBase.getSpecifiedTimeRecord(id,startTime,endTime);
     }
 }

@@ -34,6 +34,8 @@ public final class BaseConstant {
     public static final int PAUSE_STATE=2;
     public static final int STOP_STATE=3;
 
+    public static final long MILLISECONDS_PER_DAY= 24*60*60*1000;
+
 
     public static final String RAW_QUERY_SELECT_MAX_TOTAL_TIME="select "
             +Activities._ID+","
