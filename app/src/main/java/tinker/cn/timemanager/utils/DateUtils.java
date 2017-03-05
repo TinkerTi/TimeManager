@@ -19,6 +19,7 @@ public class DateUtils {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTimeInMillis();
     }
+
     // 获得当天24点时间
     public static long getTodayNight() {
         Calendar cal = Calendar.getInstance();
@@ -36,6 +37,7 @@ public class DateUtils {
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return cal.getTimeInMillis();
     }
+
     // 获得本周日24点时间
     public static long getCurrentWeekNight() {
         Calendar cal = Calendar.getInstance();
@@ -45,7 +47,6 @@ public class DateUtils {
     }
 
 
-
     // 获得本月第一天0点时间
     public static long getCurrentMonthMorning() {
         Calendar cal = Calendar.getInstance();
@@ -53,6 +54,7 @@ public class DateUtils {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         return cal.getTimeInMillis();
     }
+
     // 获得本月最后一天24点时间
     public static long getCurrentMonthNight() {
         Calendar cal = Calendar.getInstance();
@@ -105,6 +107,7 @@ public class DateUtils {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.YEAR));
         return cal.getTimeInMillis();
     }
+
     //获取本年结束时间
     public static long getCurrentYearEndTime() {
         Calendar cal = Calendar.getInstance();
@@ -117,13 +120,14 @@ public class DateUtils {
     // 获得昨天0点时间
     public static long getYesterdaymorning() {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(getTodayMorning()-3600*24*1000);
+        cal.setTimeInMillis(getTodayMorning() - 3600 * 24 * 1000);
         return cal.getTimeInMillis();
     }
+
     // 获得当天近7天时间
     public static long getWeekFromNow() {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis( getTodayMorning()-3600*24*1000*7);
+        cal.setTimeInMillis(getTodayMorning() - 3600 * 24 * 1000 * 7);
         return cal.getTimeInMillis();
     }
 
@@ -135,6 +139,7 @@ public class DateUtils {
         cal.add(Calendar.MONTH, -1);
         return cal.getTimeInMillis();
     }
+
     //去年开始时间
     public static long getLastYearStartTime() {
         Calendar cal = Calendar.getInstance();

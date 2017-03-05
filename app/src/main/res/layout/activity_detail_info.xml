@@ -3,6 +3,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/iv_select_show_type"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="right"
+        android:src="@mipmap/add_activity"/>
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lc_the_latest_seven_day_record"
         android:layout_width="match_parent"

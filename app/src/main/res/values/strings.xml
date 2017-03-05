@@ -12,4 +12,9 @@
 
     <string name="create_ok_button">确定</string>
     <string name="create_cancel_button">取消</string>
+
+    <string name="seven_days">最近七天</string>
+    <string name="seven_weeks">最近七周</string>
+    <string name="one_year">最近一年</string>
+    <string name="seven_years">最近七年</string>
 </resources>

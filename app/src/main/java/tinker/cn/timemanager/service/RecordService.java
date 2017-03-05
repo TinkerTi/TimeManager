@@ -24,9 +24,9 @@ import java.util.Set;
 import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
+import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.model.NotificationInfo;
 import tinker.cn.timemanager.model.RecordInfo;
-import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.utils.FormatTime;
 import tinker.cn.timemanager.utils.GenerateNotificationID;
 
@@ -199,6 +199,5 @@ public class RecordService extends Service {
             info.getNotificationInfo().getRemoteViews().setOnClickPendingIntent(R.id.notification_iv_stop, pendingStopIntent);
         }
     }
-
 
 }

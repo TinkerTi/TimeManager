@@ -35,7 +35,7 @@ import tinker.cn.timemanager.widget.TimeRecordItemView;
  *
  * 注意写这个的时候，bindService的回调是异步的，所以一定要注意时序的问题，不要认为，程序是按照代码的顺序一步一步执行的；
  */
-
+  //TODO:在杀死进程的时候，怎么需要做到再次进入的时候仍然正常计时；
 public class ActivityFragment extends Fragment {
 
     private List<ActivityInfo> mActivityList;
@@ -171,6 +171,8 @@ public class ActivityFragment extends Fragment {
         }
         AppContext.getInstance().popFragment();
     }
+
+
 
     private class RecordServiceConnection implements ServiceConnection {
         @Override
