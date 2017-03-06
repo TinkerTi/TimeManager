@@ -6,18 +6,9 @@ package tinker.cn.timemanager.model;
 
 public class SelectInfo {
 
-    private long timeUnit;
     private int count;
     private String label;
-    private long beginTime;
-    private long endTime;
-    public long getTimeUnit() {
-        return timeUnit;
-    }
-
-    public void setTimeUnit(long timeUnit) {
-        this.timeUnit = timeUnit;
-    }
+    private int type;
 
     public int getCount() {
         return count;
@@ -35,21 +26,12 @@ public class SelectInfo {
         this.label = label;
     }
 
-
-    public long getBeginTime() {
-        return beginTime;
+    public int getType() {
+        return type;
     }
 
-    public void setBeginTime(long beginTime) {
-        this.beginTime = beginTime;
-    }
-
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
+    public void setType(int type) {
+        this.type = type;
     }
 
 }

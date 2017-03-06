@@ -138,9 +138,9 @@ public class TimeRecordItemView extends LinearLayout {
                     mHandler.postDelayed(recordInfo.getRunnable(), 1000);
                     info.setCreateTime(System.currentTimeMillis());
                     recordInfo.setBeginTime(System.currentTimeMillis());
-                    recordInfo.setDuration(0);
-                    recordInfo.setEndTime(0);
-                    recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
+//                    recordInfo.setDuration(0);
+//                    recordInfo.setEndTime(0);
+//                    recordInfo.setRecordState(BaseConstant.RECORDING_STATE);
                     if (mServiceBinder != null) {
                         mServiceBinder.resumeRecorder(info);
                     }
@@ -170,8 +170,8 @@ public class TimeRecordItemView extends LinearLayout {
 //                    updateInfo(position, recordInfo);
                     info.setCreateTime(System.currentTimeMillis());
                     recordInfo.setBeginTime(System.currentTimeMillis());
-                    recordInfo.setEndTime(0);
-                    recordInfo.setDuration(0);
+//                    recordInfo.setEndTime(0);
+//                    recordInfo.setDuration(0);
                     //再次开始计时
                     if (mServiceBinder != null) {
                         mServiceBinder.resumeRecorder(info);

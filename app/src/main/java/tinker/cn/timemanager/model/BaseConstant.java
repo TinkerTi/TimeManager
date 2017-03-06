@@ -42,6 +42,12 @@ public final class BaseConstant {
     public static final long MILLISECONDS_PER_MONTH = 30 * MILLISECONDS_PER_DAY;
     public static final long MILLISECONDS_PER_WEEK = 7 * MILLISECONDS_PER_DAY;
 
+    public static final int DAY_TYPE = 0;
+    public static final int WEEK_TYPE = 1;
+    public static final int MONTH_TYPE = 2;
+    public static final int YEAR_TYPE = 3;
+
+
     public static final int SELECT_SHOW_SEVEN_DAY_RECORD = 0;
     public static final int SELECT_SHOW_SEVEN_WEEK_RECORD = 1;
     public static final int SELECT_SHOW_ONE_YEAR_RECORD = 2;

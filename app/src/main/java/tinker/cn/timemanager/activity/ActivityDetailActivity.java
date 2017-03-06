@@ -7,11 +7,16 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,34 +71,26 @@ public class ActivityDetailActivity extends BaseActivity {
         SelectInfo selectInfo = new SelectInfo();
         switch (selectedShowType) {
             case BaseConstant.SELECT_SHOW_SEVEN_DAY_RECORD:
-                selectInfo.setBeginTime(DateUtils.getTodayMorning());
-                selectInfo.setEndTime(DateUtils.getTodayNight());
-                selectInfo.setTimeUnit(BaseConstant.MILLISECONDS_PER_DAY);
                 selectInfo.setCount(7);
                 selectInfo.setLabel("最近七天记录");
+                selectInfo.setType(BaseConstant.DAY_TYPE);
                 drawRecordLineChart(selectInfo);
                 break;
             case BaseConstant.SELECT_SHOW_SEVEN_WEEK_RECORD:
-                selectInfo.setBeginTime(DateUtils.getCurrentWeekMorning());
-                selectInfo.setEndTime(DateUtils.getCurrentWeekNight());
                 selectInfo.setCount(7);
-                selectInfo.setTimeUnit(BaseConstant.MILLISECONDS_PER_WEEK);
+                selectInfo.setType(BaseConstant.WEEK_TYPE);
                 selectInfo.setLabel("最近七周记录");
                 drawRecordLineChart(selectInfo);
                 break;
             case BaseConstant.SELECT_SHOW_ONE_YEAR_RECORD:
-                selectInfo.setBeginTime(DateUtils.getCurrentMonthMorning());
-                selectInfo.setEndTime(DateUtils.getCurrentMonthNight());
                 selectInfo.setCount(12);
-                selectInfo.setTimeUnit(BaseConstant.MILLISECONDS_PER_MONTH);
+                selectInfo.setType(BaseConstant.MONTH_TYPE);
                 selectInfo.setLabel("最近一年记录");
                 drawRecordLineChart(selectInfo);
                 break;
             case BaseConstant.SELECT_SHOW_SEVEN_YEAR_RECORD:
-                selectInfo.setBeginTime(DateUtils.getCurrentYearStartTime());
-                selectInfo.setEndTime(DateUtils.getCurrentYearEndTime());
                 selectInfo.setCount(7);
-                selectInfo.setTimeUnit(BaseConstant.MILLISECONDS_PER_YEAR);
+                selectInfo.setType(BaseConstant.YEAR_TYPE);
                 selectInfo.setLabel("最近七年记录");
                 drawRecordLineChart(selectInfo);
                 break;
@@ -106,20 +103,44 @@ public class ActivityDetailActivity extends BaseActivity {
 
             for (int i = 0, j = selectInfo.getCount(); i < selectInfo.getCount(); i++, j--) {
                 List<ActivityInfo> info = getSpecifiedTime(activityInfo.getId(),
-                        String.valueOf(selectInfo.getBeginTime() - i * selectInfo.getTimeUnit()),
-                        String.valueOf(selectInfo.getEndTime() - i * selectInfo.getTimeUnit()));
+                        String.valueOf(DateUtils.getStartTimeByType(selectInfo.getType(),i)),
+                        String.valueOf(DateUtils.getEndTimeByType(selectInfo.getType(),i)));
                 if (info.size() > 0) {
-                    entries.add(0, new Entry(j, info.get(0).getRecordInfo().getDuration() / BaseConstant.MILLISECONDS_PER_MINUTE));
+                    entries.add(0, new Entry(j, info.get(0).getRecordInfo().getDuration() / BaseConstant.MILLISECONDS_PER_HOUR));
                 } else {
-                    entries.add(0, new Entry(j, Float.valueOf(0)));
+                    entries.add(0, new Entry(j, 0));
                 }
             }
             LineDataSet dataSet = new LineDataSet(entries, selectInfo.getLabel());
             dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-            dataSet.setColor(Color.GRAY);
+            dataSet.setColor(Color.BLUE);
             dataSet.setValueTextColor(Color.BLACK);
             LineData lineData = new LineData(dataSet);
+            lineData.setValueFormatter(new ValueFormatter());
             recordLineChart.setData(lineData);
+            recordLineChart.setDoubleTapToZoomEnabled(false);
+            //设置x轴属性
+            XAxis xAxis=recordLineChart.getXAxis();
+            xAxis.setDrawGridLines(false);
+            xAxis.setDrawAxisLine(true);
+            xAxis.setAxisMinimum(1);
+            xAxis.setAxisMaximum(selectInfo.getCount());
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setGranularity(1f);
+            //设置y轴属性
+            YAxis leftAxis=recordLineChart.getAxisLeft();
+            YAxis rightAxis=recordLineChart.getAxisRight();
+            leftAxis.setDrawGridLines(false);
+            leftAxis.setDrawAxisLine(true);
+            leftAxis.setDrawZeroLine(false);
+            rightAxis.setDrawAxisLine(false);
+            rightAxis.setDrawGridLines(false);
+            rightAxis.setDrawLabels(false);
+
+            recordLineChart.getLegend().setEnabled(false);
+            Description description=new Description();
+            description.setText("");
+            recordLineChart.setDescription(description);
             recordLineChart.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,5 +150,18 @@ public class ActivityDetailActivity extends BaseActivity {
     private List<ActivityInfo> getSpecifiedTime(String id, String beginTime, String endTime) {
         Cursor cursor = DaoManager.getInstance().getSpecifiedTimeRecord(id, beginTime, endTime);
         return DaoManager.getInstance().parseCursor(cursor);
+    }
+
+
+    private class ValueFormatter implements IValueFormatter{
+
+        private DecimalFormat mFormat;
+        public ValueFormatter(){
+            mFormat =new DecimalFormat("0.00");
+        }
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            return mFormat.format(value);
+        }
     }
 }
