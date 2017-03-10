@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import tinker.cn.timemanager.R;
-import tinker.cn.timemanager.activity.MainActivity;
+import tinker.cn.timemanager.ui.activity.MainActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.model.NotificationInfo;

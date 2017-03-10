@@ -14,7 +14,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <tinker.cn.timemanager.widget.FragmentViewPager
+        <tinker.cn.timemanager.ui.widget.FragmentViewPager
             android:id="@+id/ac_vp_view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -26,21 +26,21 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:gravity="center_vertical">
-        <tinker.cn.timemanager.widget.TabIndicatorItemView
+        <tinker.cn.timemanager.ui.widget.TabIndicatorItemView
             android:id="@+id/tab_activity"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             custom:IndicatorButton="@mipmap/activity_icon"
             custom:IndicatorText="@string/bottom_text_view_activity" />
-        <tinker.cn.timemanager.widget.TabIndicatorItemView
+        <tinker.cn.timemanager.ui.widget.TabIndicatorItemView
             android:id="@+id/tab_record"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             custom:IndicatorButton="@mipmap/group_icon"
             custom:IndicatorText="@string/bottom_text_view_month_detail" />
-        <tinker.cn.timemanager.widget.TabIndicatorItemView
+        <tinker.cn.timemanager.ui.widget.TabIndicatorItemView
             android:id="@+id/tab_me"
             android:layout_width="0dp"
             android:layout_weight="1"

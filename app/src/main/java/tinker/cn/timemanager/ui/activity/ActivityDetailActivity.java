@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.activity;
+package tinker.cn.timemanager.ui.activity;
 
 import android.database.Cursor;
 import android.graphics.Color;
@@ -27,7 +27,7 @@ import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.model.SelectInfo;
 import tinker.cn.timemanager.utils.DateUtils;
-import tinker.cn.timemanager.widget.SelectShowTimePopupWindow;
+import tinker.cn.timemanager.ui.widget.SelectShowTimePopupWindow;
 
 /**
  * Created by tiankui on 2/13/17.

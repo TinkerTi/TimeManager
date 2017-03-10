@@ -21,14 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tinker.cn.timemanager.R;
-import tinker.cn.timemanager.activity.ActivityDetailActivity;
+import tinker.cn.timemanager.ui.activity.ActivityDetailActivity;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.service.RecordService;
 import tinker.cn.timemanager.AppContext;
 import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.db.DaoManager;
-import tinker.cn.timemanager.widget.AddImageButton;
-import tinker.cn.timemanager.widget.TimeRecordItemView;
+import tinker.cn.timemanager.ui.widget.AddImageButton;
+import tinker.cn.timemanager.ui.widget.TimeRecordItemView;
 
 /**
  * Created by tiankui on 1/2/17.

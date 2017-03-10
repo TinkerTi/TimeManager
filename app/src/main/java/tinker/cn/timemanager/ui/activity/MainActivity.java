@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.activity;
+package tinker.cn.timemanager.ui.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -21,8 +21,8 @@ import tinker.cn.timemanager.fragment.HistoryRecordsFragment;
 import tinker.cn.timemanager.fragment.MeFragment;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.BaseConstant;
-import tinker.cn.timemanager.widget.FragmentViewPager;
-import tinker.cn.timemanager.widget.TabIndicatorItemView;
+import tinker.cn.timemanager.ui.widget.FragmentViewPager;
+import tinker.cn.timemanager.ui.widget.TabIndicatorItemView;
 
 
 public class MainActivity extends BaseActivity implements CreateActivityGroupDialogFragment.NoticeDialogListener, View.OnClickListener {

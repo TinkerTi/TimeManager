@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.widget;
+package tinker.cn.timemanager.ui.widget;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,7 +13,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import tinker.cn.timemanager.R;
-import tinker.cn.timemanager.activity.ActivityDetailActivity;
+import tinker.cn.timemanager.ui.activity.ActivityDetailActivity;
 import tinker.cn.timemanager.model.BaseConstant;
 
 /**

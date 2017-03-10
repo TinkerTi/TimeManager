@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.activity;
+package tinker.cn.timemanager.ui.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

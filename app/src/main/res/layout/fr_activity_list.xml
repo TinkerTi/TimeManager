@@ -16,7 +16,7 @@
             android:background="#EFEBE9"/>
     </ScrollView>
 
-    <tinker.cn.timemanager.widget.AddImageButton
+    <tinker.cn.timemanager.ui.widget.AddImageButton
         android:id="@+id/fr_iv_add_activity"
         android:layout_width="40dp"
         android:layout_height="40dp"

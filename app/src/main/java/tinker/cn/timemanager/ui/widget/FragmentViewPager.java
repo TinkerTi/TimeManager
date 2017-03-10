@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.widget;
+package tinker.cn.timemanager.ui.widget;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
