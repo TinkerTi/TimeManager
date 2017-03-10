@@ -1,8 +1,11 @@
 package tinker.cn.timemanager.widget;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +22,8 @@ import tinker.cn.timemanager.model.BaseConstant;
 
 public class SelectShowTimePopupWindow extends PopupWindow {
 
-    ActivityDetailActivity activityDetailActivity=null;
+    private ActivityDetailActivity activityDetailActivity = null;
+
     public SelectShowTimePopupWindow(Activity context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.select_show_time_popup_window, null);
@@ -33,20 +37,18 @@ public class SelectShowTimePopupWindow extends PopupWindow {
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         setFocusable(true);
         setOutsideTouchable(true);
-        ColorDrawable dw = new ColorDrawable(0000000000);
-        // 点back键和其他地方使其消失,设置了这个才能触发OnDismisslistener ，设置其他控件变化等操作
+        ColorDrawable dw = new ColorDrawable(24420863);
         setBackgroundDrawable(dw);
-        // 需要调用这个，才会显示
         update();
 
-        if(context instanceof ActivityDetailActivity){
-            activityDetailActivity=(ActivityDetailActivity)context ;
+        if (context instanceof ActivityDetailActivity) {
+            activityDetailActivity = (ActivityDetailActivity) context;
         }
 
         showSevenDayTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(activityDetailActivity!=null){
+                if (activityDetailActivity != null) {
                     activityDetailActivity.selectShowType(BaseConstant.SELECT_SHOW_SEVEN_DAY_RECORD);
                     dismiss();
                 }
@@ -56,7 +58,7 @@ public class SelectShowTimePopupWindow extends PopupWindow {
         showSevenWeekTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(activityDetailActivity!=null){
+                if (activityDetailActivity != null) {
                     activityDetailActivity.selectShowType(BaseConstant.SELECT_SHOW_SEVEN_WEEK_RECORD);
                     dismiss();
                 }
@@ -66,7 +68,7 @@ public class SelectShowTimePopupWindow extends PopupWindow {
         showOneYearTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(activityDetailActivity!=null){
+                if (activityDetailActivity != null) {
                     activityDetailActivity.selectShowType(BaseConstant.SELECT_SHOW_ONE_YEAR_RECORD);
                     dismiss();
                 }
@@ -76,7 +78,7 @@ public class SelectShowTimePopupWindow extends PopupWindow {
         showSevenYearTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(activityDetailActivity!=null){
+                if (activityDetailActivity != null) {
                     activityDetailActivity.selectShowType(BaseConstant.SELECT_SHOW_SEVEN_YEAR_RECORD);
                     dismiss();
                 }
@@ -84,9 +86,14 @@ public class SelectShowTimePopupWindow extends PopupWindow {
         });
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public void showPopupWindow(View anchor) {
         if (!isShowing()) {
-            showAsDropDown(anchor);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                showAsDropDown(anchor, -60, 10);
+            } else {
+                showAsDropDown(anchor, -90, 0, Gravity.TOP | Gravity.RIGHT);
+            }
         } else {
             dismiss();
         }

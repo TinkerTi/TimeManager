@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -38,6 +39,7 @@ public class ActivityDetailActivity extends BaseActivity {
 
     private LineChart recordLineChart;
     private ImageView selectShowTypeImageView;
+    private TextView descriptionTitleTextView;
 
     private int selectedShowType;
 
@@ -52,6 +54,7 @@ public class ActivityDetailActivity extends BaseActivity {
         }
         recordLineChart = (LineChart) findViewById(R.id.lc_the_latest_seven_day_record);
         selectShowTypeImageView = (ImageView) findViewById(R.id.iv_select_show_type);
+        descriptionTitleTextView=(TextView)findViewById(R.id.tv_description_title);
         selectShowTypeImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,17 +78,20 @@ public class ActivityDetailActivity extends BaseActivity {
                 selectInfo.setLabel("最近七天记录");
                 selectInfo.setType(BaseConstant.DAY_TYPE);
                 drawRecordLineChart(selectInfo);
+                descriptionTitleTextView.setText(R.string.seven_days);
                 break;
             case BaseConstant.SELECT_SHOW_SEVEN_WEEK_RECORD:
                 selectInfo.setCount(7);
                 selectInfo.setType(BaseConstant.WEEK_TYPE);
                 selectInfo.setLabel("最近七周记录");
                 drawRecordLineChart(selectInfo);
+                descriptionTitleTextView.setText(R.string.seven_weeks);
                 break;
             case BaseConstant.SELECT_SHOW_ONE_YEAR_RECORD:
                 selectInfo.setCount(12);
                 selectInfo.setType(BaseConstant.MONTH_TYPE);
                 selectInfo.setLabel("最近一年记录");
+                descriptionTitleTextView.setText(R.string.one_year);
                 drawRecordLineChart(selectInfo);
                 break;
             case BaseConstant.SELECT_SHOW_SEVEN_YEAR_RECORD:
@@ -93,6 +99,7 @@ public class ActivityDetailActivity extends BaseActivity {
                 selectInfo.setType(BaseConstant.YEAR_TYPE);
                 selectInfo.setLabel("最近七年记录");
                 drawRecordLineChart(selectInfo);
+                descriptionTitleTextView.setText(R.string.seven_years);
                 break;
         }
     }
@@ -157,7 +164,7 @@ public class ActivityDetailActivity extends BaseActivity {
 
         private DecimalFormat mFormat;
         public ValueFormatter(){
-            mFormat =new DecimalFormat("0.00");
+            mFormat =new DecimalFormat("0.##");
         }
         @Override
         public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {

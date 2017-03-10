@@ -2,29 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#FDFEFE">
 
     <TextView
         android:id="@+id/tv_show_seven_day"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/seven_days"/>
-
+        style="@style/popup_window_content"
+        android:text="@string/seven_days" />
+    <View
+        style="@style/popup_window_content_divider"/>
     <TextView
         android:id="@+id/tv_show_seven_weeks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/popup_window_content"
         android:text="@string/seven_weeks"/>
-
+    <View
+        style="@style/popup_window_content_divider"/>
     <TextView
         android:id="@+id/tv_show_one_year"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/popup_window_content"
         android:text="@string/one_year"/>
-
+    <View
+        style="@style/popup_window_content_divider"/>
     <TextView
         android:id="@+id/tv_show_seven_years"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/popup_window_content"
         android:text="@string/seven_years"/>
 </LinearLayout>
