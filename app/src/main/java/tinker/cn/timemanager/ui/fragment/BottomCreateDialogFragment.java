@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.fragment;
+package tinker.cn.timemanager.ui.fragment;
 
 import android.app.Dialog;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package tinker.cn.timemanager.fragment;
+package tinker.cn.timemanager.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

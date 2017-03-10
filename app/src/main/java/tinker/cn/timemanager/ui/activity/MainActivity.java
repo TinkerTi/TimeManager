@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 import tinker.cn.timemanager.R;
-import tinker.cn.timemanager.fragment.ActivityFragment;
-import tinker.cn.timemanager.fragment.CreateActivityGroupDialogFragment;
-import tinker.cn.timemanager.fragment.HistoryRecordsFragment;
-import tinker.cn.timemanager.fragment.MeFragment;
+import tinker.cn.timemanager.ui.fragment.ActivityFragment;
+import tinker.cn.timemanager.ui.fragment.CreateActivityGroupDialogFragment;
+import tinker.cn.timemanager.ui.fragment.HistoryRecordsFragment;
+import tinker.cn.timemanager.ui.fragment.MeFragment;
 import tinker.cn.timemanager.model.ActivityInfo;
 import tinker.cn.timemanager.model.BaseConstant;
 import tinker.cn.timemanager.ui.widget.FragmentViewPager;
@@ -100,20 +100,6 @@ public class MainActivity extends BaseActivity implements CreateActivityGroupDia
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialogFragment, ActivityInfo info) {
-//        if (info == null) {
-//            return;
-//        }
-//        List<ActivityInfo> activityInfo = mActivityInfoMap.get(info.getFragmentTag());
-//        if (activityInfo == null) {
-//            activityInfo = new ArrayList<>();
-//        }
-//
-//        if (info.getParentGroupId().equals("") && info.getType() == BaseConstant.TYPE_ACTIVITY) {
-//            activityInfo.add(0, info);
-//        } else {
-//            activityInfo.add(info);
-//        }
-//        mActivityInfoMap.put(info.getFragmentTag(), activityInfo);
         ActivityFragment activityFragment = (ActivityFragment) getSupportFragmentManager().findFragmentByTag(info.getFragmentTag());
         if (activityFragment != null) {
             activityFragment.addActivity(info);
