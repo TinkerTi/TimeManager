@@ -60,6 +60,12 @@ public final class BaseConstant {
     public static final int CONTENT_TYPE =2;
     public static final int CONTENT_DETAIL_TYPE=3;
 
+    public static final int PLAN_SUMMARY_TYPE =4;
+    public static final int PLAN_DETAIL_TYPE=5;
+    public static final int ADD_PLAN_SIMPLE_TYPE=6;
+    public static final int ADD_PLAN_DETAIL_TYPE=7;
+    public static final int ADD_PLAN_TYPE=8;
+
 
 
     public static final String RAW_QUERY_SELECT_MAX_TOTAL_TIME = "select "

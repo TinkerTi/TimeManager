@@ -2,11 +2,13 @@ package tinker.cn.timemanager.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.TextView;
 
 import tinker.cn.timemanager.R;
 import tinker.cn.timemanager.model.BaseConstant;
+import tinker.cn.timemanager.ui.addPlan.AddPlanFragment;
 
 /**
  * Created by tiankui on 3/12/17.
@@ -22,6 +24,10 @@ public class AddPlanDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.ac_add_plan_detail);
+        AddPlanFragment addPlanFragment=new AddPlanFragment();
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        fragmentManager.beginTransaction().add(R.id.fl_add_plan_detail_container,addPlanFragment).commit();
         Intent intent = getIntent();
         planType = intent.getIntExtra("planType", -1);
         switch (planType) {
