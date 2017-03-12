@@ -22,7 +22,11 @@
         </activity>
         <activity android:name=".ui.activity.ActivityDetailActivity"/>
         <activity android:name=".ui.activity.BaseActivity"/>
+        <activity android:name=".ui.activity.AddPlanDetailActivity"/>
+
+
         <service android:name=".service.RecordService"/>
+
     </application>
 
 </manifest>

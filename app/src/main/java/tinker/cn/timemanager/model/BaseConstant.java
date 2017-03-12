@@ -46,12 +46,20 @@ public final class BaseConstant {
     public static final int WEEK_TYPE = 1;
     public static final int MONTH_TYPE = 2;
     public static final int YEAR_TYPE = 3;
+    public static final int LONG_TERM_TYPE = 4;
+
 
 
     public static final int SELECT_SHOW_SEVEN_DAY_RECORD = 0;
     public static final int SELECT_SHOW_SEVEN_WEEK_RECORD = 1;
     public static final int SELECT_SHOW_ONE_YEAR_RECORD = 2;
     public static final int SELECT_SHOW_SEVEN_YEAR_RECORD = 3;
+
+    public static final int DIVIDER_TYPE=0;
+    public static final int TITLE_TYPE=1;
+    public static final int CONTENT_TYPE =2;
+    public static final int CONTENT_DETAIL_TYPE=3;
+
 
 
     public static final String RAW_QUERY_SELECT_MAX_TOTAL_TIME = "select "

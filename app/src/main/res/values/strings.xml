@@ -17,4 +17,8 @@
     <string name="seven_weeks">最近七周</string>
     <string name="one_year">最近一年</string>
     <string name="seven_years">最近七年</string>
+
+    <string name="add_plan_every_day">每日计划</string>
+    <string name="add_plan_this_week">每周计划</string>
+    <string name="add_plan_long_time">长期计划</string>
 </resources>

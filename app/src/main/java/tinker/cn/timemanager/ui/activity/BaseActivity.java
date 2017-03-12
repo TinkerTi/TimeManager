@@ -18,7 +18,7 @@ import tinker.cn.timemanager.R;
  * Created by tiankui on 2/13/17.
  */
 
-public class BaseActivity extends FragmentActivity implements View.OnClickListener {
+public class BaseActivity extends FragmentActivity{
 
     private FrameLayout viewContainer;
     protected TextView nameTextView;
@@ -36,7 +36,12 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         nameTextView = (TextView) findViewById(R.id.tv_title);
         searchImageView=(ImageView)findViewById(R.id.iv_search_button);
         titleBar=(RelativeLayout)findViewById(R.id.rl_title_bar);
-        navigationImageView.setOnClickListener(this);
+        navigationImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                  BaseActivity.this.finish();
+            }
+        });
 
         onCreateTitleBar(new ActionBar());
     }
@@ -52,14 +57,6 @@ public class BaseActivity extends FragmentActivity implements View.OnClickListen
         viewContainer.addView(view);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.iv_navigate_back:
-                finish();
-                break;
-        }
-    }
 
     protected void onCreateTitleBar(ActionBar titleBar){}
 

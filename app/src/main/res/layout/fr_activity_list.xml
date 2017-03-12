@@ -25,5 +25,5 @@
         android:layout_marginBottom="15dp"
         android:layout_marginRight="15dp"
         app:AddButtonBackground="@drawable/wi_add_button_background"
-        app:AddButtonImageSrc="@drawable/wi_add_button_image" />
+        app:AddButtonImageSrc="@drawable/wi_add_button_vector" />
 </RelativeLayout>

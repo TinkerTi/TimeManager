@@ -14,18 +14,39 @@ public class ActivityInfo implements Parcelable {
      * 其实这两类也可以看做一类，即都是Activity，只是第一类Activity所属的群组为空
      * 第二类归属于某一个群组；
      */
-    private String fragmentTag;
-    private RecordInfo recordInfo;
-    private NotificationInfo notificationInfo;
-
     private String id;//每一个后动或者群组对应一个id；这个要个数据库中的每一排的唯一的id区分开
     private String name;    //活动或者群组名；
-    private int type;   //是活动还是群组，0是活动，1是群组；
-    private String parentGroupId;//所属群组，如果是单个活动或者群组，则为空""，否则为所属群组id
-    private long createTime;//一次完整的时间记录中开始记录的时间（从start到stop的时间）
 
+    private int priority;//目标优先级
+
+
+    private long planTime;//计划时间
+    /**
+     *   旧的规则是：所属群组，如果是单个活动或者群组，则为空""，否则为所属群组id
+     *   新的规则：当前的如果是每日目标，则可以选择加入一个周目标，那么日目标活动时间将会计入到周目标的时间内；
+     *   或者是周目标可以加入一个长期目标；
+     */
+    private String parentGroupId;
+    /**
+     * 目标持续时间，举例来说如果是每日目标，值为2时，表示该目标会连续两天出现在每日目标的列表中，然后失效；
+     */
+    private long keepTime;
     private long originCreateTime;//活动创建的时间
     private String tag;//标识活动的类别，为日后的统计分类用；
+
+    /**
+     * 旧的用法：区别是活动还是群组，0是活动，1是群组
+     *
+     */
+    private int type;
+
+
+
+
+    private long createTime;//一次完整的时间记录中开始记录的时间（从start到stop的时间）
+    private RecordInfo recordInfo;
+    private NotificationInfo notificationInfo;
+    private String fragmentTag;
 
     public ActivityInfo() {
     }
@@ -40,6 +61,9 @@ public class ActivityInfo implements Parcelable {
         createTime = in.readLong();
         originCreateTime=in.readLong();
         tag=in.readString();
+        priority=in.readInt();
+        planTime=in.readLong();
+        keepTime=in.readLong();
     }
 
     @Override
@@ -53,6 +77,9 @@ public class ActivityInfo implements Parcelable {
         dest.writeLong(createTime);
         dest.writeLong(originCreateTime);
         dest.writeString(tag);
+        dest.writeInt(priority);
+        dest.writeLong(planTime);
+        dest.writeLong(keepTime);
     }
 
     @Override
@@ -154,6 +181,32 @@ public class ActivityInfo implements Parcelable {
 
     public void setOriginCreateTime(long originCreateTime) {
         this.originCreateTime = originCreateTime;
+    }
+
+
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public long getPlanTime() {
+        return planTime;
+    }
+
+    public void setPlanTime(long planTime) {
+        this.planTime = planTime;
+    }
+
+    public long getKeepTime() {
+        return keepTime;
+    }
+
+    public void setKeepTime(long keepTime) {
+        this.keepTime = keepTime;
     }
 
 

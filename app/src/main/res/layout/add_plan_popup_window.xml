@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_add_every_day_plan"
+        style="@style/add_plan_popup_window"
+        android:text="@string/add_plan_every_day"/>
+    <TextView
+        android:id="@+id/tv_add_this_week_plan"
+        style="@style/add_plan_popup_window"
+        android:text="@string/add_plan_this_week"/>
+    <TextView
+        android:id="@+id/tv_add_this_long_time_plan"
+        style="@style/add_plan_popup_window"
+        android:text="@string/add_plan_long_time"/>
+</LinearLayout>
