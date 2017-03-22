@@ -20,6 +20,9 @@ public class SelectPlanPopupWindow extends PopupWindow {
     int popupWidth;
     int popupHeight;
     public SelectPlanPopupWindow(Activity context){
+        //这个一定不能少；
+        super(context);
+
         this.context=context;
         LayoutInflater inflater=(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view=inflater.inflate(R.layout.add_plan_popup_window,null);

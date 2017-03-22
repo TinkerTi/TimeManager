@@ -21,4 +21,13 @@
     <string name="add_plan_every_day">每日计划</string>
     <string name="add_plan_this_week">每周计划</string>
     <string name="add_plan_long_time">长期计划</string>
+
+    <string name="add_plan_add">添加</string>
+    <string name="add_plan_name">名称</string>
+    <string name="add_plan_more">更多选项</string>
+    <string name="add_plan_priority">优先级</string>
+    <string name="add_plan_time">计划用时</string>
+    <string name="add_plan_parent_week">加入周目标</string>
+    <string name="add_plan_parent_long_term">持续时间</string>
+    <string name="add_plan_tag">标签</string>
 </resources>

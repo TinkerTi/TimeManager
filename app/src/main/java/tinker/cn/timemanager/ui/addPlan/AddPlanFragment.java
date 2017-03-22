@@ -35,9 +35,11 @@ public class AddPlanFragment extends Fragment {
 
     private void initModelData(){
         List<ItemModel> modelList=new ArrayList<>();
-        ItemModel.PlanSummaryModel planSummaryModel=new ItemModel.PlanSummaryModel();
-        planSummaryModel.setPlanName("写app");
-        modelList.add(planSummaryModel);
+        ItemModel.AddPlanModel addPlanModel=new ItemModel.AddPlanModel();
+//        ItemModel.PlanSummaryModel planSummaryModel=new ItemModel.PlanSummaryModel();
+//        planSummaryModel.setPlanName("写app");
+//        modelList.add(planSummaryModel);
+        modelList.add(addPlanModel);
         addPlanAdapter.setModelList(modelList);
 //        addPlanAdapter.notifyItemChanged(0);
     }

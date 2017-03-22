@@ -45,7 +45,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter{
                 holder=new PlanDetailViewHolder(view);
                 break;
             case BaseConstant.ADD_PLAN_TYPE:
-                view=inflater.inflate(R.layout.item_add_plan_detail,parent,false);
+                view=inflater.inflate(R.layout.item_add_plan_add,parent,false);
                 holder=new AddPlanViewHolder(view);
                 break;
 
