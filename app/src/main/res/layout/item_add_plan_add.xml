@@ -20,11 +20,13 @@
             android:layout_toRightOf="@id/tv_add_plan_name_dis"
             android:layout_marginLeft="20dp"/>
         <EditText
+            android:id="@+id/et_add_plan_name"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@id/tv_add_plan_name_dis"/>
         <TextView
+            android:id="@+id/tv_add_plan_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

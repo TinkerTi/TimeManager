@@ -62,7 +62,7 @@ public final class BaseConstant {
 
     public static final int PLAN_SUMMARY_TYPE =4;
     public static final int PLAN_DETAIL_TYPE=5;
-    public static final int ADD_PLAN_SIMPLE_TYPE=6;
+    public static final int ADD_PLAN_SUMMARY_TYPE=6;
     public static final int ADD_PLAN_DETAIL_TYPE=7;
     public static final int ADD_PLAN_TYPE=8;
 

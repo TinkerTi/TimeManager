@@ -1,5 +1,9 @@
 package tinker.cn.timemanager.model;
 
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.EditText;
+
 /**
  * Created by tiankui on 3/11/17.
  */
@@ -188,6 +192,12 @@ public abstract class ItemModel {
         private String addParentPlanId;
         private String addParentPlanName;
         private String tag;
+        private View.OnClickListener addListener;
+        private View.OnClickListener moreListener;
+        private TextWatcher textWatcher;
+        private EditText editText;
+
+
 
         public AddPlanModel(){}
         @Override
@@ -251,14 +261,57 @@ public abstract class ItemModel {
         public void setTag(String tag) {
             this.tag = tag;
         }
+
+
+        public View.OnClickListener getAddListener() {
+            return addListener;
+        }
+
+        public void setAddListener(View.OnClickListener addListener) {
+            this.addListener = addListener;
+        }
+
+        public View.OnClickListener getMoreListener() {
+            return moreListener;
+        }
+
+        public void setMoreListener(View.OnClickListener moreListener) {
+            this.moreListener = moreListener;
+        }
+
+        public TextWatcher getTextWatcher() {
+            return textWatcher;
+        }
+
+        public void setTextWatcher(TextWatcher textWatcher) {
+            this.textWatcher = textWatcher;
+        }
+
+
+        public EditText getEditText() {
+            return editText;
+        }
+
+        public void setEditText(EditText editText) {
+            this.editText = editText;
+        }
     }
 
-    public class AddPlanSummaryModel extends ItemModel {
+    public static class AddPlanSummaryModel extends ItemModel {
+
         public String planName;
+
+        public String getPlanName() {
+            return planName;
+        }
+
+        public void setPlanName(String planName) {
+            this.planName = planName;
+        }
 
         @Override
         public int getType() {
-            return BaseConstant.ADD_PLAN_SIMPLE_TYPE;
+            return BaseConstant.ADD_PLAN_SUMMARY_TYPE;
         }
     }
 

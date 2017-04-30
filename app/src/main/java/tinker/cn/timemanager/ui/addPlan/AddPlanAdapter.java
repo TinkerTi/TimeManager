@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -17,36 +18,38 @@ import tinker.cn.timemanager.model.ItemModel;
  * Created by tiankui on 3/12/17.
  */
 
-public class AddPlanAdapter extends RecyclerView.Adapter{
+public class AddPlanAdapter extends RecyclerView.Adapter {
 
     List<ItemModel> modelList;
 
-    public AddPlanAdapter(){
-        modelList=new ArrayList<>();
+    public AddPlanAdapter() {
+        modelList = new ArrayList<>();
     }
+
     @Override
     public int getItemViewType(int position) {
-        ItemModel model=modelList.get(position);
+        ItemModel model = modelList.get(position);
         return model.getType();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater=LayoutInflater.from(parent.getContext());
-        ItemHolder holder=null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ItemHolder holder = null;
         View view;
-        switch (viewType){
+        switch (viewType) {
             case BaseConstant.PLAN_SUMMARY_TYPE:
-                view=inflater.inflate(R.layout.item_add_plan_summary,parent,false);
-                holder=new PlanSummaryViewHolder(view);
+            case BaseConstant.ADD_PLAN_SUMMARY_TYPE:
+                view = inflater.inflate(R.layout.item_add_plan_summary, parent, false);
+                holder = new AddPlanSummaryViewHolder(view);
                 break;
             case BaseConstant.PLAN_DETAIL_TYPE:
-                view=inflater.inflate(R.layout.item_add_plan_detail,parent,false);
-                holder=new PlanDetailViewHolder(view);
+                view = inflater.inflate(R.layout.item_add_plan_detail, parent, false);
+                holder = new PlanDetailViewHolder(view);
                 break;
             case BaseConstant.ADD_PLAN_TYPE:
-                view=inflater.inflate(R.layout.item_add_plan_add,parent,false);
-                holder=new AddPlanViewHolder(view);
+                view = inflater.inflate(R.layout.item_add_plan_add, parent, false);
+                holder = new AddPlanViewHolder(view);
                 break;
 
         }
@@ -64,7 +67,7 @@ public class AddPlanAdapter extends RecyclerView.Adapter{
     }
 
 
-    public abstract class ItemHolder extends RecyclerView.ViewHolder{
+    public abstract class ItemHolder extends RecyclerView.ViewHolder {
 
         public ItemHolder(View itemView) {
             super(itemView);
@@ -73,23 +76,24 @@ public class AddPlanAdapter extends RecyclerView.Adapter{
         public abstract void update(int position);
     }
 
-    public class PlanSummaryViewHolder extends ItemHolder{
+    public class AddPlanSummaryViewHolder extends ItemHolder {
         private TextView addPlanName;
         private TextView deletePlan;
-        public PlanSummaryViewHolder(View itemView) {
+
+        public AddPlanSummaryViewHolder(View itemView) {
             super(itemView);
-            addPlanName=(TextView)itemView.findViewById(R.id.tv_add_plan_name);
-            deletePlan=(TextView)itemView.findViewById(R.id.tv_delete_this_plan);
+            addPlanName = (TextView) itemView.findViewById(R.id.tv_add_plan_name);
+            deletePlan = (TextView) itemView.findViewById(R.id.tv_delete_this_plan);
         }
 
         @Override
         public void update(int position) {
-            ItemModel.PlanSummaryModel planSummaryModel=(ItemModel.PlanSummaryModel) modelList.get(position);
+            ItemModel.AddPlanSummaryModel planSummaryModel = (ItemModel.AddPlanSummaryModel) modelList.get(position);
             addPlanName.setText(planSummaryModel.getPlanName());
         }
     }
 
-    public class PlanDetailViewHolder extends ItemHolder{
+    public class PlanDetailViewHolder extends ItemHolder {
 
         public PlanDetailViewHolder(View itemView) {
             super(itemView);
@@ -101,15 +105,25 @@ public class AddPlanAdapter extends RecyclerView.Adapter{
         }
     }
 
-    public class AddPlanViewHolder extends ItemHolder{
+    public class AddPlanViewHolder extends ItemHolder {
+
+        private EditText nameEditText;
+        private TextView addTextView;
 
         public AddPlanViewHolder(View itemView) {
             super(itemView);
+            nameEditText = (EditText) itemView.findViewById(R.id.et_add_plan_name);
+            addTextView = (TextView) itemView.findViewById(R.id.tv_add_plan_item);
         }
 
         @Override
         public void update(int position) {
-
+            ItemModel.AddPlanModel model = (ItemModel.AddPlanModel) modelList.get(position);
+            nameEditText.addTextChangedListener(model.getTextWatcher());
+            //TODO：这里点击添加按钮之后应该是，把相关的plan信息添加到数据库，然后展示的时候直接从数据库里边读取就可以了；
+            addTextView.setOnClickListener(model.getAddListener());
+            model.setEditText(nameEditText);
+            nameEditText.setText("");
         }
     }
 
@@ -119,5 +133,6 @@ public class AddPlanAdapter extends RecyclerView.Adapter{
 
     public void setModelList(List<ItemModel> modelList) {
         this.modelList = modelList;
+        notifyDataSetChanged();
     }
 }
